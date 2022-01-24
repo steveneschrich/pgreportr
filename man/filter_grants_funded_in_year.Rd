@@ -2,18 +2,18 @@
 % Please edit documentation in R/filter.R
 \name{filter_grants_funded_in_year}
 \alias{filter_grants_funded_in_year}
-\title{Filter grant table d to grants with funding starting in U54 year yr.}
+\title{Filter grant table d to grants with funding starting in PG year yr.}
 \usage{
 filter_grants_funded_in_year(d, yr)
 }
 \arguments{
 \item{d}{Grant table}
 
-\item{yr}{Partnership Grant Year to filter by.}
+\item{yr}{Program Grant Year to filter by.}
 }
 \value{
-A grant table filtered to grants starting in Partnership Grant year yr.
+A grant table filtered to grants starting in Program Grant year yr.
 }
 \description{
-Filter grant table d to grants with funding starting in U54 year yr.
+Filter grant table d to grants with funding starting in PG year yr.
 }

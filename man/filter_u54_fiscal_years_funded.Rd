@@ -9,14 +9,14 @@ filter_u54_fiscal_years_funded(d, grant_years)
 \arguments{
 \item{d}{The grant table}
 
-\item{grant_years}{A list of U54 fiscal years (e.g., Y01, Y02) to filter to.}
+\item{grant_years}{A list of PG fiscal years (e.g., Y01, Y02) to filter to.}
 }
 \value{
 A filtered grant table with only grants whose funding started in grant_years.
 }
 \description{
 Starting from the grant table, filter the table to only include
-grants that started funding in specific U54 fiscal years (listed as
+grants that started funding in specific Program Grant fiscal years (listed as
 Y01, Y02, ...). Note: grant funding can occur in a different
 fiscal year from grant submission.
 }

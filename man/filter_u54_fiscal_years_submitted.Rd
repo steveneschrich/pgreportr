@@ -2,14 +2,14 @@
 % Please edit documentation in R/filter.R
 \name{filter_u54_fiscal_years_submitted}
 \alias{filter_u54_fiscal_years_submitted}
-\title{Filter grant table d to grants submitted within the U54 fiscal years grant_years.}
+\title{Filter grant table d to grants submitted within the Program Grant fiscal years grant_years.}
 \usage{
 filter_u54_fiscal_years_submitted(d, grant_years)
 }
 \arguments{
 \item{d}{The grant table}
 
-\item{grant_years}{A list of U54 fiscal years (e.g., Y01, Y02) to filter to.}
+\item{grant_years}{A list of PG fiscal years (e.g., Y01, Y02) to filter to.}
 }
 \value{
 A filtered grant table with only grants that were submitted in grant_years.

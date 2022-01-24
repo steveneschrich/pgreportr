@@ -7,7 +7,7 @@
 filter_grants_in_preparation(d)
 }
 \arguments{
-\item{d}{The grants table from u54reportr}
+\item{d}{The grants table from pgreportr}
 }
 \value{
 A filtered grants table, limited to those grants in preparation.

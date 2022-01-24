@@ -30,7 +30,9 @@ Imports:
   flextable,
   lubridate,
   tibble,
-  officer
+  officer,
+  rmarkdown,
+  here
 Suggests: 
     testthat (>= 3.0.0),
     knitr,

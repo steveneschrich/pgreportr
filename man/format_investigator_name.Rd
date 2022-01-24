@@ -36,7 +36,7 @@ To uniquely identify a person, we use the convention of \verb{GivenNameInitials.
 for instance.
 }
 \details{
-The data for u54reportr uses full names for investigators. Shortening these names to first initials
+The data for pgreportr uses full names for investigators. Shortening these names to first initials
 is tricky since people may have multiple given names (i.e., middle names). This code takes all names
 except the last name (tokenized by whitespace) and abbreviates them, followed by a period. The last
 name is then added and returned.
