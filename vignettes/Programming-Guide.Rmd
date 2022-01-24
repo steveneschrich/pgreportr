@@ -1,0 +1,115 @@
+---
+title: "Programming-Guide"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Programming-Guide}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(u54reportr)
+```
+
+# grants tibble
+The main interface to activities within u54reportr is the tibble containing the grant information. This is created by `import-redcap-data()`, which loads REDCap data (obviously) and performs a variety of actions, including:
+
+- adding indicator variables for conditions
+- removing extraneous variables
+- cleaning up variable names to pretty-print versions
+- coalescing multiple, related fields into a single value
+
+# is functions
+There are a number of different conditions that can be tested for within u54reportr. These are all grouped under the verb `is`. This section provides some details on the approach taken for functions.
+
+First, it should be clear when looking at the documentation that the package has an excessive amount of detailed function calls. This was deliberate, since although some of the fields may be constrained in value within the grants table, what values get used and why is not always the case. Therefore, u54reportr implements these different decision points within code for hopefully more clear documentation.
+
+There are several layers to the `is_` functions. It should be noted up front that the grants table, when created, actually contains a large number of indicator variables. This is helpful because if you want to manually inspect the table, or export the table to a file, then the indicator variables stand on their own. So there are several layers which essentially just return these indicator variables (see comments above on why this excessive functional annotation hopefully helps in understanding the data). At the bottom of this stack, however, are the generator functions themselves. These types are described below.
+
+## Generator functions
+The first series of functions are the generator functions. These begin with the prefix `.is_` as opposed to `is_`, as a way to denote their internal-ish nature. You can use these functions (they are not exported by default but you can access them via the `:::` operator, as in `u54reportr:::.is_whatever()`. These functions all take the grants table as input and calculates the indicator variable (T/F logical results) assuming that the indicator variables do not previously exist. When the grants table is being built in the first place, the last step is to create all of these indicator variables by calling their generator function. 
+
+In general, these functions should not be needed in normal operations because indicator variables are created during the load process. However, there may be some point at which these could be useful.
+
+## Dispatch functions
+The remainder of the `is_` functions are dispatch functions. These functions actually perform different tasks depending on the argument provided. The functions are capable of taking a grants tibble. This is the most typical application of the function, in which a tibble has been filtered (for instance) and then piped into the is_ function. Calling it using this approach has the effect of providing a logical array (T/F) with one value for each row of the tibble. So for instance,
+
+```
+grants %>%
+   is_grant_joint()
+```
+would provide a logical vector of indicators whether grant rows are joint grants or not.
+
+But what happens if I want to filter on joint grants, rather than get an indicator? That's where the dual nature of the function comes in. Call the function without a tibble and it returns the variable to use that represents the function activity. So for instance
+
+```
+grants %>%
+   filter( !! is_grant_joint())
+```
+This is convenient, but is worth unpacking just a bit. As mentioned, calling `is_grant_joint()` without a tibble (since it's within the filter function it doesn't see the tibble) means you get the variable back. Let's say the variable is called `is_grant_joint`. The `!!` means to interpret what follows as the name of a variable after evauating it. Since the underlying variable `is_grant_joint` is a logical column, this has the effect of filtering the table such that `is_grant_joint` is TRUE. A lot of work to go through, agreed, but as mentioned this keeps the small details of what it means to have a joint grant and what the joint grant variable name is, out of the way. Meaning it can change underneath and not break your code. Plus the function is_grant_joint can be well documented so it is clear what it really means.
+
+### Dispatcher
+The previous section described dispatch functions. It is not clear from context what exactly that means. It means that there is a dispatcher (`dispatch_on_field`) that takes a tibble and a variable name. If the tibble is provided, it `pulls` the variable from the tibble. If the tibble is not provided, it returns the name of the variable. This makes the code to implement these dual-use functions as simple as 
+```
+dispatch_on_field(tb, name="is_grant_esi_related")
+```
+for example.
+
+# Data Structure
+The data structure is simple: it is a `tibble`. Each row of the `tibble` represents an individual grant. Additional columns are added (during load time) to annotate the grants further. Thus, most of the work of users of the library are `filter`ing and `count`ing the rows of the tibble. Of note, since the structure is a `tibble` the user can feel free to use `dplyr` as desired. Although using the built-in library functions formalize filtering logic which can be helpful, particularly when the process is complex.
+
+A complexity to this structure is that there are multiple investigators for a single grant. Fortunately, a `tibble` allows for nested `tibble`s inside a single cell of the table. Actually, `tibble`s support having a one-to-many relationship (e.g., grant to investigators) which can be `nest`ed and `unnest`ed. Thus, the `investigators` field comes along for the ride during normal operation. When something is needed with respect to `investigators`, it is usually easier to call library functions to deal with it.
+
+As a programmer, the nested tibble (investigators) practically means that `dplyr::nest`, `dplyr::unnest` are helpful functions. There is also the pattern
+```
+tbl %>%
+   rowwise() %>%
+   summarize(newvar=function_f(investigators))
+```
+
+While not vectorized in a normal sense, it does allow you to write a function (`function_f`) that handles a `tibble` of investigators and return a single result. This can be very convenient, although your mileage may vary in terms of `unlist` - be warned.
+
+# Organization
+
+## Data Import
+The first step for using the library is to import redcap data (`import_redcap_data`). This step loads the raw data, creates new columns and overall prepares the grant table for use. It is a single tibble, representing all grants recorded. There are several verbs specific for this particular part of the library:
+
+`annotate` is the verb to add new columns, typically indicator columns, to the grants table. Rather than recompute conditions on the fly, we pre-compute these and annotate the tibble accordingly. This allows data exports to be explicit in terms of derived information used during reporting.
+
+`derive` is the verb for adding new columns that are derivations of other columns. Examples include splitting dates from other columns or mapping dates onto U54 grant funding years.
+
+
+
+## Data Reporting
+`report` is the verb for filtering, styling and formatting a grants table into a reportable output. It combines all these activities into a single action, although it is reasonable to do these things separately yourself, particularly if the defaults don't work for you.
+
+`filter` is the action to filter rows of the grants table based on conditions. These are made explicit through function calls, to hopefully make things more clear.
+
+`style` is the verb for broad formatting, renaming, etc of a table for a report. This encompasses multiple steps and so should not be confused with rather specific operations associated with `format`.
+
+`format` is the verb for specific formatting conversions. For instance, formatting an investigator's name. Contrast with `style` that does many different things together to make a coherent report style.
+
+
+Note that the `report` verb is rather undeveloped at present.
+
+## style
+The goal of the style verb is to apply various transformations to columns (typically either `format` or other simple transformations) and `select`ing out specific columns to show. Each report requires different styles, which makes it challenging to have a one-size-fits-all function. There is some limited options available for tweaking a specific style. At present, the approach I've taken is to create different styles (called `alpha`, `beta`, etc) depending on need. In particular, each style also has the prefix `_as_flextable` or `_as_text` since the formatting is very specific to the output type.
+
+All of the style functions take a grants tibble as input. By convention, although not explicitly enforced or implemented, the tibble should be in whatever sorted order the caller wants. The library rearranges columns, merges columns, and groups rows, but does not change the arrangement of the tibble. 
+
+Additionally, the grants tibble should be `filter`ed and `arrange`ed prior to styling. Any variables should ideally be created during the `import_redcap_data` step. Since many different functions in the library require specific fields be present, it is much cleaner to have all derived fields created initially.
+
+
+## format
+There are two main format types used for output in the library: flextable and text. In order to accommodate both types, there are some generic and specific functions. If there are specific functions for this, there will be functions with the prefix `as_text` or `as_flextable`. 
+
+The biggest challenge for formatting is the nested investigators tibble (see `format_investigators.R` for details). Flextable provides a `compose` function which allows you to rowwise derive summary data. In order to achieve this, I wrote a generic function that allows you to group investigators (by institution in this case) then format these investigators as a tibble and collapse the investigators into a single entity. Since I support both flextable and text, the function takes two parameters - functions for the grouping and the collapsing. The `...` parameters are liberally scattered throughout since many other functions have formatting flags to set. I'm not entirely sure how well it works. 
+
+There are currently two main functions: format_investigators and format_investigators_by_institution. These are generally called from style, but need not be. The bulk of the processing/code associated with style is in formatting the investigators.

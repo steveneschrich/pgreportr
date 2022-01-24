@@ -1,0 +1,360 @@
+---
+title: "U54 Grant Report - Core Usage"
+project: 
+author: ''
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+investigators:
+  - name: ""
+project_team:
+analysis_team:
+analysis_contact:
+organization: "PHSU-MCC Quantitative Sciences Core"
+output:
+  pdf_document: default
+  html_document: default
+params:
+  report_start_date: "2017-09-01"
+  report_end_date: "2021-02-28"
+  redcap_data: "../../../../PEC Tracking Data/PartnershipTrackingG_R_2021-07-22_1715.r"
+  core: "PRBB"
+---
+
+
+# Overview
+This report provides information on grants (submitted, pending, funded) tracked by the U54. In particular,
+each grant is annotated with information about cores that support/will support the project. This report
+will pull out grants supported by a specific core (as annotated by the param `core`) and report on these.
+
+This document does not actually generate the report through a normal rmarkdown process
+but rather generates a word (and excel) document as part of the code. The code formats and 
+outputs the monthly report. The markdown document is retained in order to better 
+annotate the process (and decision-making) in the creation of this report.
+
+This code takes advantage of two very large packages that handle most of the work.
+
+- officer/officedown/flextable: This is a (very) nice way of creating a word document that allows for normal word-related formatting, etc. It is still relatively early in it's lifecycle but has been very helpful in producing the type of layout needed. In particular, the goal is to create a Word document template filled with style definitions. Then the R code can stick text/tables into this document using the pre-defined styles. Hence, a nicely organized Word document. That is what occurs in this markdown. There is a large loop (currently) that generates all of the tables for a specific fiscal year. At the end of the loop, all of the tables are added (with formatting) to the word document. Then, after the loop exits the Word document is written out to disk.
+
+- u54reportr: The data on which these reports is written is taken from a redcap server project that was specifically designed for this type of data. A package (u54reportr) is responsible for taking the raw output of the redcap project and converting it into a usable form for reporting (namely, a tibble). The library has functions to summarize and/or filter by a number of criteria that are useful in the U54 context.
+
+In summary, this code is responsible for loading the redcap data (via u54reportr), slicing and dicing it per reporting criteria (via u54reportr), and then output in attractive summary tables for various projects (via officer/et al).
+
+# Parameters
+NOTE: There are parameters (currently) for this report: 
+
+- report_start_date: A YYYY-MM-DD date to start reporting from.
+- report_end_date: A YYYY-MM-DD date beyond which no entries are considered.
+- redcap_data: The path to the `.r` file associated with a redcap export (currently). Download the data from the redcap server (two files), and then point this variable to the `.r` file.
+- core: Grants are annotated with core usage, filter to this core (or leave as empty string to report on everything).
+
+# Code
+The code for generating the report is included in the markdown output so that it is clear what is going
+on. In particular, reporting can get quite complex when it comes to date cutoffs and status. 
+
+```{r setup}
+suppressPackageStartupMessages({
+  library(readxl)
+  library(dplyr)
+  library(tibble)
+  library(readr)
+  library(lubridate)
+  library(knitr)
+  library(tidyverse)
+  library(janitor)
+  library(here)
+  library(flextable)
+  library(officer)
+  library(officedown)
+  library(u54reportr)
+  library(openxlsx)
+})
+
+# Install once
+#install.packages('webshot')
+#webshot::install_phantomjs()
+
+knitr::opts_chunk$set(echo=TRUE)
+
+
+
+reporting_date<-params$report_end_date
+reporting_cutoff<-lubridate::ymd(reporting_date)
+reporting_month<-as.character(lubridate::month(reporting_cutoff, abbr=FALSE, label=TRUE))
+reporting_year<-as.character(lubridate::year(reporting_cutoff))
+
+
+redcap_version_date<-stringr::str_extract(params$redcap_data,"(?<=_)\\d{4}-\\d\\d-\\d\\d(?=_)")
+# Split the data into grants and investigators. 
+grants<-u54reportr::import_redcap_data(params$redcap_data)
+
+
+```
+
+Create the word document based on the "Monthly Report Template" document, and
+set the title/subtitle/table of contents. Note that you have to open the Word document to generate the TOC, so be sure to do that (and save the result) before sending to others.
+
+```{r}
+doc <- get_docx_template("monthly") %>%
+  body_add_par(sprintf("PHSU-MCC Grant Report %s Usage (%s - %s)", 
+                       params$core,
+                       params$report_start_date, 
+                       params$report_end_date),
+               style = "Title") %>%
+  body_add_par(format(Sys.time(), '%d %B, %Y'), style="Subtitle") %>%
+  body_add_par(sprintf("\nREDCap data version: %s",redcap_version_date)) %>%
+  body_add_par("\n\n\n\n")  %>%
+  body_add_par("Table of Contents", style = "TOC Heading") %>% 
+  body_add_toc(separator=",") %>%
+  body_add_break()
+```
+
+
+This code allows filtering based on a core. Or, if blank, we can include everything.
+```{r}
+if (params$core != "")
+  grants <- grants %>% 
+  filter(stringr::str_detect(`U54 Core Support`,params$core))
+```
+
+
+```{r}
+
+# Current Partnership Grant reporting year
+yr<-convert_date_to_pg_year(reporting_date)
+
+grants_submitted<-grants %>%
+  filter_grants_submitted_between(start = params$report_start_date, 
+                                  end = params$report_end_date) %>%
+  arrange(`Submission Date`)
+
+grants_funded<-grants %>%
+  filter_grants_funded_between(start=params$report_start_date,end=params$report_end_date) %>%
+  arrange(`Funding Start Date`)
+
+grants_pending<-grants %>%
+  filter_grants_submitted_between(start = pg_start_date("Y01"), 
+                                  end=params$report_end_date) %>%
+  filter_grants_pending_review() %>%
+  arrange(`Submission Date`)
+
+```
+
+```{r}
+
+get_detail<-function(x, tag=NULL, row_number=NULL) {
+  assertthat::assert_that(! (is.null(tag) & is.null(row_number)))
+  
+  if ( is.null(tag)) {
+    target<-x %>% filter(row_number() == !!row_number)
+  } else {
+    target<-x %>% filter(tag == !!tag)
+  }
+  assertthat::assert_that(nrow(target)==1)
+  
+  (target %>% pull(Detail))[[1]]
+}
+# The goal of this tibble is:
+# tag: Easy name to refer to row
+# Description: Header text
+# Count: Number of category
+# Detail: Tibble of grants meeting the category criteria
+#
+yr_summary<-tibble::tribble(
+    ~tag, ~Description, ~Count, ~Detail,
+  "submissions",
+  sprintf("Total Grant Submissions"), 
+  count_submissions(grants_submitted),
+  grants_submitted,
+  
+  "esi-related submissions",
+  sprintf("Total ESI-Related Grants Submitted"), 
+  count_submissions(grants_submitted %>% filter_grants_esi_related()),
+  grants_submitted %>% filter_grants_esi_related(),
+  
+  "num esi-related mentions",
+  sprintf("Total Number of times an ESI was involved in a submission"),
+  count_submissions(grants_submitted %>% 
+                                filter_grants_esi_related() %>%
+                                tidyr::unnest(cols=investigators) %>%
+                                filter(is_esi_investigator(`Partnership Role`))),
+  # NB: This really isn't needed, since it's not printed in details.
+  grants_submitted %>% filter_grants_esi_related(),
+  
+  "submissions not funded",
+  sprintf("Total Grant Submissions Not Funded"), 
+  count_submissions(grants_submitted %>% filter_grants_not_funded()),
+  grants_submitted %>% filter_grants_not_funded(),
+  
+  "grants funded",
+  sprintf("Total Grants Funded"), 
+  count_grants_funded(grants_funded),
+  grants_funded,
+  
+  "esi grants funded",
+  sprintf("Total ESI-related Grants Funded"), 
+  count_grants_funded(grants_funded %>% filter_grants_esi_related()),
+  grants_funded %>% filter_grants_esi_related(),
+  
+  "submissions pending",
+  sprintf("Total Grant Submissions Pending Review"),
+  nrow(grants_pending),
+  grants_pending,
+  
+  "esi submissions pending",
+  sprintf("Total ESI-Related Grant Submissions Pending Review"), 
+  nrow(grants_pending %>% filter_grants_esi_related()),
+  grants_pending %>% filter_grants_esi_related()
+  )
+  
+```
+
+```{r}
+  # Show the summary table.
+  summary_table<-yr_summary %>%
+    mutate(`Count` = tidyr::replace_na(`Count`, "0")) %>%
+    select(Description, Count) %>%
+    flextable() %>%
+    flextable::bg(bg="#4F81BD", part="header") %>%
+    flextable::color(color="#FFFFFF", part="header") %>%
+    flextable::set_table_properties(width=0.5, layout="autofit")  %>%
+    flextable::fontsize(size=8, part="header") %>%
+    flextable::align(j =2, align = "right", part = "body")
+
+  
+  doc <- doc %>% 
+    body_add_par(value = sprintf("Summary"), style="heading 1") %>%
+    body_add_par(value = "\n\n") %>%
+    body_add_par(style="heading 2",value=(sprintf("Summary counts"))) %>%
+    body_add_flextable(value = summary_table, split=TRUE ) %>%
+    body_add_break()
+  
+```
+  
+
+  
+  
+```{r write-xls}
+
+write.xlsx(x=list("Grants Submitted" = 
+                    style_grants_as_text_alpha(
+                      get_detail(yr_summary, tag="submissions")), 
+                  "Grants Submitted ESI-Related" =
+                    style_grants_as_text_alpha(
+                      get_detail(yr_summary, tag="esi-related submissions")),
+                  "Grants Unfunded" =
+                    style_grants_as_text_alpha(
+                      get_detail(yr_summary,tag="submissions not funded")),
+                  "Grants Funded" =
+                    style_grants_as_text_alpha(
+                      get_detail(yr_summary,tag="grants funded")),
+                  "Grants Funded ESI-related" =
+                    style_grants_as_text_alpha(
+                      get_detail(yr_summary, tag="esi grants funded")),
+                  "Submissions Pending" = 
+                    style_grants_as_text_alpha(
+                      get_detail(yr_summary, tag="submissions pending")),
+                  "Submissions Pending ESI-related" =
+                    style_grants_as_text_alpha(
+                      get_detail(yr_summary, tag="esi submissions pending"))
+            ),
+           asTable=FALSE, file=
+             sprintf("%s_Grant_Tracking_Tables_%s_%s_%s.xlsx",
+                              ifelse(params$core=="","Full",
+                                     stringr::str_replace_all(params$core," ","_")),
+                              params$report_start_date, 
+                              params$report_end_date,
+                              datestamp()
+                        )
+)
+```
+
+```{r}
+  doc<-doc %>%
+  
+    body_add_par(
+      style="heading 2",
+      value=stringr::str_c(yr_summary[1,c("Description","Count")], collapse=": ")
+    ) %>%
+    body_add_flextable(value = get_detail(yr_summary, row_number=1) %>%
+                         style_grants_as_flextable_gamma(),
+                       split=TRUE
+    ) %>%
+    body_add_break() %>%
+
+  
+    body_add_par(
+      style="heading 2",
+      value=stringr::str_c(yr_summary[2,c("Description","Count")], collapse=": ")
+    )  %>%
+    body_add_flextable(value = get_detail(yr_summary, row_number=2) %>%
+                         style_grants_as_flextable_gamma(),
+                       split=TRUE
+    ) %>%
+    body_add_break() %>%  
+
+  
+    body_add_par(
+      style="heading 2",
+      value=stringr::str_c(yr_summary[4,c("Description","Count")], collapse=": ")
+    ) %>%
+    body_add_flextable(value = get_detail(yr_summary, row_number=4) %>%
+          style_grants_as_flextable_gamma(),
+          split=TRUE
+    ) %>%
+    body_add_break() %>%
+
+  
+    body_add_par(
+      style="heading 2",
+      value=stringr::str_c(yr_summary[5,c("Description","Count")], collapse=": ")
+    ) %>%
+    body_add_flextable(value = get_detail(yr_summary, row_number=5) %>%
+                         style_grants_as_flextable_gamma(),
+                       split=TRUE
+    ) %>%
+    body_add_break() %>%
+
+  
+    body_add_par(
+      style="heading 2",
+      value=stringr::str_c(yr_summary[6,c("Description","Count")], collapse=": ")
+    ) %>%
+    body_add_flextable(value = get_detail(yr_summary, row_number=6) %>%
+                         style_grants_as_flextable_gamma(), 
+                       split=TRUE
+    ) %>%
+    body_add_break() %>%
+
+
+    body_add_par(
+      style="heading 2",
+      value=stringr::str_c(yr_summary[7,c("Description","Count")], collapse=": ")
+    ) %>%
+    body_add_flextable(value = get_detail(yr_summary, row_number=7) %>%
+                         style_grants_as_flextable_gamma(), 
+                       split=TRUE
+    ) %>%
+    body_add_break() %>%
+
+    
+    body_add_par(
+      style="heading 2",
+      value=stringr::str_c(yr_summary[8,c("Description","Count")], collapse=": ")
+    ) %>%
+    body_add_flextable(value = get_detail(yr_summary, row_number=8) %>%
+                         style_grants_as_flextable_gamma(),
+                       split=TRUE) %>%
+    body_add_break()
+
+
+```
+
+
+Save the results to a word document (Core_Report_YYYYMMDD.docx).
+```{r}
+print(doc, target = sprintf("%s_Report_%s_%s_%s.docx",
+                            ifelse(params$core=="","Full",stringr::str_replace_all(params$core," ","_")),
+                            params$report_start_date, 
+                            params$report_end_date,
+                            datestamp()))
+```
+
