@@ -10,4 +10,6 @@
 #'   \item{investigators}{An embedded tibble of investigators}
 #'   ...
 #' }
-"grants"
+grants <- function(...) {
+  ido::Data("pgreportr::grants", ...)
+}
