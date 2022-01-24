@@ -87,3 +87,23 @@ add_list_total<-function(l) {
   s<-sum(l)
   c(l, "TOTAL"=s)
 }
+
+
+#' Title
+#'
+#' @details This is a function to expand out the investigators to find ESI's,
+#' then provide a total count of these. Note this will mean multiple
+#' entries per grant.
+#'
+#' @param g
+#'
+#' @return
+#' @export
+#'
+#' @examples
+count_esi_mentions_in_grant<-function(g) {
+  g %>%
+    expand_investigators(cols=investigators) %>%
+    dplyr::filter(is_esi_investigator(`Partnership Role`)) %>%
+    nrow()
+}
