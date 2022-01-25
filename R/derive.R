@@ -106,9 +106,9 @@ derive_fiscal_year_summary<-function(submitted, funded) {
 derive_funding_dates<-function(d) {
   d %>%
     dplyr::mutate(`Funding Start Date` =
-                    convert_date(split_date_range(.data$`project_period`)[,1])) %>%
+                    lubridate::mdy(split_date_range(.data$`project_period`)[,1])) %>%
     dplyr::mutate(`Funding End Date` =
-                    convert_date(split_date_range(.data$`project_period`)[,2]))
+                    lubridate::mdy(split_date_range(.data$`project_period`)[,2]))
 }
 
 

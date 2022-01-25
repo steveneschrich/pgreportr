@@ -35,17 +35,6 @@ format_date_as_mdy<-function(d) {
 split_date_range<-function(s) {
   stringr::str_split_fixed(s, "-", 2)
 }
-#' Convert date from redcap (m/d/y format).
-#'
-#' @param s A character vector to convert.
-#'
-#' @return A Date object.
-#' @export
-#'
-#' @examples
-convert_date<-function(s) {
-  lubridate::mdy(s)
-}
 
 
 
