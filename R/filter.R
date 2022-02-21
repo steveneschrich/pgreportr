@@ -1,43 +1,22 @@
-#
-# filter.R
-#
-# This contains code for filtering the grant table based on various criteria. It is easier
-# to implement these as functions, rather than remember the specific variables to filter on.
-# The logic can be implemented consistently this way.
+#' Filtering grants and publications
+#'
+#'
+#' @details This contains code for filtering the grant table based on
+#' various criteria. It is easier
+#' to implement these as functions, rather than remember the specific variables to filter on.
+#' The logic can be implemented consistently this way.
+#'
+#' @name filter
+NULL
+#> NULL
 
 
-#' Filter grant table d to submissions in Partnership Grant year yr.
+#' Filter records between dates
 #'
-#' The grant table contains grants from all time periods. However, reporting
-#' often occurs by specific Grant Year. The Grant Year is different from the
-#' calendar year and fiscal year, and is specifically defined for the grant.
+#' @description This function filters a reporting table, based on the
+#' variable `var`, to keep records with dates between `start` and `end`.
 #'
-#' Additionally, a grant can be submitted (more than once) prior to being funded
-#' (if it ever does get funded). This function handles submissions, rather than
-#' funding.
-#'
-#' Thus, this function filters a grant table to those that were submitted
-#' in Partnership Grant year yr.
-#'
-#' NOTE: This function is vector-aware, meaning that multiple grant years can be
-#' included.
-#'
-#' @param d Grant table
-#' @param yr Partnership Grant Year to filter by.
-#'
-#' @return A grant table filtered to submissions from year yr.
-#' @export
-#'
-#' @importFrom rlang .data
-#' @examples
-filter_grants_submitted_in_year<-function(d, yr) {
-  assertthat::assert_that(has_name(d, "U54 Fiscal Year Submitted"))
-  d %>%
-    filter_grants_submitted() %>%
-    dplyr::filter(.data$`U54 Fiscal Year Submitted` %in% yr)
-}
-
-#' Filter to grants submitted between start and end.
+#' @details
 #'
 #' This function filters the grants table to only grants that are submitted between the
 #' specified start and end date. The dates must be input as YYYY-MM-DD format.
@@ -47,23 +26,96 @@ filter_grants_submitted_in_year<-function(d, yr) {
 #'
 #' Note that the dates are inclusive (meaning they include the date specified).
 #'
-#' @param d The grants table
+#' @param .x The table to filter
 #' @param start Start date (YYYY-MM-DD)
-#' @param end End date (YYYY-MM-DD)
+#' @param end End date (YYYY-MM-DD) default: current date
 #'
-#' @return A filtered grants table.
-#' @export
+#' @return A table filtered on start/end dates for `var`.
 #'
 #' @importFrom lubridate %within%
 #' @importFrom dplyr %>%
+#'
+#' @export
+#' @examples
+filter_between <- function(.x, var, start, end = format(Sys.time(), '%Y%m%d')) {
+  dplyr::filter(.x, {{ var }} %within% lubridate::interval(start,end))
+}
+
+#' @describeIn filter_between Filter grants submitted between dates
+#' @export
+filter_grants_submitted_between<-function(.x, ...) {
+  .x %>%
+    filter_grants_submitted() %>%
+    filter_between(var = `Submission Date`, ...)
+}
+
+#' @describeIn filter_between Filter grants funded between dates
+#' @export
+filter_grants_funded_between <- function(.x, ...) {
+  .x %>%
+    filter_grants_funded() %>%
+    filter_between(var = `Funding Start Date`, ...)
+}
+
+#' @describeIn filter_between Filter publications published between dates
+#' @export
+filter_pubs_between <- function(.x, ...) {
+  filter_between(var = `Publication Date`, ...)
+}
+
+
+
+#' Filter records in Partnership Grant year yr.
+#'
+#' Records are from all time periods. However, reporting
+#' often occurs by specific Grant Year. The Grant Year is different from the
+#' calendar year and fiscal year, and is specifically defined for the
+#' partnership grant.
+#'
+#' Thus, this function filters records to those that were submitted
+#' in Partnership Grant year yr.
+#'
+#' NOTE: This function is vector-aware, meaning that multiple grant years can be
+#' included.
+#'
+#' @param d tibble of records
+#' @param var Variable to use for grant year
+#' @param yr Partnership Grant Year to filter by.
+#'
+#' @return A tibble filtered to submissions from year yr.
+#' @export
+#'
 #' @importFrom rlang .data
 #' @examples
-filter_grants_submitted_between<-function(d, start, end=format(Sys.time(), '%Y%m%d')) {
-  d %>%
+filter_in_year <- function(.x, var, yr = print_pg_years() ) {
+  dplyr::filter(.x, {{ var }} %in% yr)
+}
+
+
+#' @describeIn filter_in_year Filter grants submitted in year
+#' @export
+filter_grants_submitted_in_year <- function(.x, ...) {
+  .x %>%
     filter_grants_submitted() %>%
-    dplyr::filter(.data$`Submission Date` %within% lubridate::interval(start,end))
+    filter_in_year(var = `U54 Fiscal Year Submitted`, ...)
+}
+
+#' @describeIn filter_in_year Filter grants with funding starting in PG year yr.
+#' @export
+filter_grants_funded_in_year<-function(.x, ...) {
+  .x %>%
+    filter_grants_funded() %>%
+    filter_in_year(var = `U54 Fiscal Year Funded`, ...)
 
 }
+
+#' @describeIn filter_in_year Filter publications in Partnership Grant year yr
+#' @export
+filter_pubs_in_year <- function(.x, ...) {
+  filter_in_year(var = `U54 Year Published`, ...)
+}
+
+
 
 #' Filter to grants submitted between start and end.
 #'
@@ -87,44 +139,7 @@ filter_grants_submitted<-function(d) {
   dplyr::filter(d, !!is_grant_submitted())
 }
 
-#' Filter to grants funded between start and end.
-#'
-#' This function filters the grants table to only grants that are funded between the
-#' specified start and end date. The dates must be input as YYYY-MM-DD format.
-#'
-#' Note that
-#' if you do not specify an end date then today's date is used.
-#'
-#' Note that the dates are inclusive (meaning they include the date specified).
-#'
-#' @param d The grants table
-#' @param start Start date (YYYY-MM-DD)
-#' @param end End date (YYYY-MM-DD)
-#'
-#' @return A filtered grants table.
-#' @export
-#' @importFrom lubridate %within%
-#' @importFrom dplyr %>%
-#' @importFrom rlang .data
-#' @examples
-filter_grants_funded_between<-function(d, start, end=format(Sys.time(), '%Y-%m-%d')) {
-  filter_grants_funded(d) %>%
-    dplyr::filter(.data$`Funding Start Date` %within% lubridate::interval(start,end))
 
-}
-#' Filter grant table d to grants with funding starting in PG year yr.
-#'
-#' @param d Grant table
-#' @param yr Program Grant Year to filter by.
-#'
-#' @return A grant table filtered to grants starting in Program Grant year yr.
-#' @export
-#'
-#' @importFrom rlang .data
-#' @examples
-filter_grants_funded_in_year<-function(d, yr) {
-  dplyr::filter(filter_grants_funded(d), .data$`U54 Fiscal Year Funded`==yr)
-}
 
 
 
@@ -200,6 +215,114 @@ filter_grants_pending_review<-function(d) {
 
 
 
+#' Title
+#'
+#' @param .x
+#'
+#' @return
+#' @export
+#'
+#' @examples
+filter_supported <- function(.x, var) {
+  dplyr::filter(.x, !!is_supported())
+}
+
+#' Filter table on those with any core support.
+#'
+#' @param d  The grant table
+#'
+#' @return A filtered grant table with only grants having grant support.
+#' @export
+#'
+#' @examples
+filter_core_supported <- function(.x) {
+  dplyr::filter(.x, !!is_core_supported())
+}
+
+#' @describeIn filter_core_supported  Filter grants with core support
+#' @export
+filter_grants_core_supported<-function(.x) {
+  filter_core_supported(.x)
+}
+
+#' @describeIn filter_core_supported Filter pubs with core support
+#' @export
+filter_pubs_core_supported <- function(.x) {
+  filter_core_supported(.x)
+}
+
+#' Title
+#'
+#' @param .x
+#'
+#' @return
+#' @export
+#'
+#' @examples
+filter_other_support <- function(.x) {
+  dplyr::filter(.x, !!is_other_support())
+}
+
+
+
+
+#' Filter grants table to only grants with investigators from both MCC and PHSU.
+#'
+#' @param grants A grants table
+#'
+#' @return A filtered grants table that consists of joint grants
+#' @export
+#'
+#' @examples
+filter_grants_joint<-function(grants) {
+  dplyr::filter(grants, !!is_grant_joint())
+}
+
+
+
+#' Filter grants table to only grants that are R-type.
+#'
+#' @param grants A grants table
+#'
+#' @return A filtered grants table that consists of R-type grants
+#' @export
+#'
+#' @examples
+filter_grants_rtype<-function(grants) {
+  dplyr::filter(grants, !!is_grant_rtype())
+}
+
+
+
+
+
+#' Title
+#'
+#' @param .x
+#' @param tag
+#'
+#' @return
+#' @export
+#'
+#' @examples
+filter_by_tag <- function(.x, tag) {
+  dplyr::filter(.x, !!has_tag(tag))
+}
+#' Title
+#'
+#' @param .x
+#' @param support
+#'
+#' @return
+#' @export
+#'
+#' @examples
+filter_by_support <- function(.x, support) {
+  dplyr::filter(.x, !!has_support(support))
+}
+
+
+
 
 
 #' Filter grant table d to grants that start funding within the U54 fiscal years grant_years.
@@ -241,61 +364,4 @@ filter_u54_fiscal_years_submitted<-function(d, grant_years) {
     dplyr::mutate(`U54 Fiscal Year Submitted` = factor(`U54 Fiscal Year Submitted`))
 }
 
-
-#' Filter grant table on those grants with any core support.
-#'
-#' @param d  The grant table
-#'
-#' @return A filtered grant table with only grants having grant support.
-#' @export
-#'
-#' @examples
-filter_core_supported<-function(d) {
-  dplyr::filter(d, !is.na(.data$`U54 Core Support`))
-}
-
-
-
-
-
-#' Filter grants table to only grants with investigators from both MCC and PHSU.
-#'
-#' @param grants A grants table
-#'
-#' @return A filtered grants table that consists of joint grants
-#' @export
-#'
-#' @examples
-filter_grants_joint<-function(grants) {
-  dplyr::filter(grants, !!is_grant_joint())
-}
-
-
-
-#' Filter grants table to only grants that are R-type.
-#'
-#' @param grants A grants table
-#'
-#' @return A filtered grants table that consists of R-type grants
-#' @export
-#'
-#' @examples
-filter_grants_rtype<-function(grants) {
-  dplyr::filter(grants, !!is_grant_rtype())
-}
-
-#' Filter grants table to PHSU Cancer-related grants.
-#'
-#' This filter will reduce the grant table to those grants with a Grant Tags
-#' field including PHSU Cancer-related.
-#'
-#' @param grants A grants table
-#'
-#' @return A filtered grants table that is PHSU Cancer Related
-#' @export
-#'
-#' @examples
-filter_grants_phsu_cancer_related<-function(grants) {
-    dplyr::filter(grants, !!is_grant_phsu_cancer_related())
-}
 

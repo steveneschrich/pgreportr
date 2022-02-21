@@ -29,6 +29,13 @@ collapse_investigators<-function(grants) {
 
 }
 
+collapse_invstigators_alt <- function(.x) {
+  purrr::map_chr(.x, function(.y) {
+    .y %>%
+      format_investigators_text()
+  })
+}
+
 
 
 

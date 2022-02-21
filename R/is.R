@@ -1,4 +1,108 @@
 
+#' Title
+#'
+#' @param .x
+#' @param support
+#'
+#' @return
+#' @export
+#'
+#' @examples
+is_supported_by <- function(.x=NULL, support) {
+  dispatch_on_field(.x, paste0("isSupportedBy_", support))
+}
+
+#' @describeIn is_supported_by Is grant supported by a resource?
+#' @export
+is_grant_supported_by <- function(.x, ...) {
+  is_supported_by(.x, ...)
+}
+
+#' @describeIn is_supported_by Is publication supported by a resource?
+#' @export
+is_pub_supported_by <- function(.x, ...) {
+  is_supported_by(.x, ...)
+}
+
+
+#' Title
+#'
+#' @param .x
+#'
+#' @return
+#' @export
+#'
+#' @examples
+is_support <- function(.x) {
+  dispatch_on_field(tb, name="is_support")
+}
+
+#' Title
+#'
+#' @param .x
+#'
+#' @return
+#' @export
+#'
+#' @examples
+is_core_support <- function(.x) {
+  dispatch_on_field(tb, name="is_core_support")
+}
+
+
+#' @describeIn is_core_support Is grant supported by core
+#' @export
+is_grant_core_support <- function(.x) {
+  is_core_support(.x)
+}
+
+#' @describeIn is_core_support Is pub supported by core
+#' @export
+is_pub_core_support <- function(.x) {
+  is_core_support(.x)
+}
+
+
+#' Title
+#'
+#' @param .x
+#'
+#' @return
+#' @export
+#'
+#' @examples
+is_other_support <- function(.x) {
+  dispatch_on_field(tb, name="is_other_support")
+}
+
+#' @describeIn is_other_support Is grant supported by other support
+#' @export
+is_grant_other_support <- function(.x) {
+  is_other_support(.x)
+}
+#' @describeIn is_other_support Is pub supported by other support
+#' @export
+is_pub_other_support <- function(.x) {
+  is_other_supported(.x)
+}
+
+
+
+#' Title
+#'
+#' @param .x
+#'
+#' @return
+#' @export
+#'
+#' @examples
+list_support <- function(.x) {
+  stringr::str_remove(
+    stringr::str_subset(colnames(.x),"^isSupportedBy_"),"^isSupportedBy_"
+  )
+}
+
+
 #' Is the grant funded?
 #'
 #' Return a logical value for each grant status in the supplied list,
@@ -87,22 +191,8 @@ is_grant_in_preparation<-function(tb=NULL) {
 }
 
 
-#' Is the grant PHSU Cancer Related?
-#'
-#' This is an indicator if the grant is related to PHSU and Cancer (a criteria
-#' for reporting). Return a vector of logicals indicating if the grants represented by that
-#' field are PHSU Cancer-related or not (or the field name if tb is not included).
-#'
-#'
-#' @param tb A grants table or nothing (in which case the field name is returned).
-#'
-#' @return A vector of logical values indicating if the grant is PHSU Cancer Related or field name.
-#' @export
-#'
-#' @example
-is_grant_phsu_cancer_related<-function(tb=NULL) {
-  dispatch_on_field(tb, name="is_grant_phsu_cancer_related")
-}
+
+
 
 #' Is the grant R type?
 #'
@@ -150,17 +240,28 @@ is_grant_joint<-function(tb=NULL) {
 #' field are ESI-related or not (or the field name if tb is not included).
 #'
 #'
-#' @param tb A grants table or nothing (in which case the field name is returned).
+#' @param .x A grants table or nothing (in which case the field name is returned).
 #'
 #' @return A vector of logical values indicating if the grant is ESI-related or the field name.
 #' @export
 #'
 #' @example
 #
-is_grant_esi_related<-function(tb=NULL) {
-  dispatch_on_field(tb, name="is_grant_esi_related")
+is_esi_related <- function(.x=NULL) {
+  dispatch_on_field(.x, name="is_esi_related")
 }
 
+#' @describeIn is_esi_related Is grant related to an ESI?
+#' @export
+is_grant_esi_related<-function(...) {
+  is_esi_related(...)
+}
+
+#' @describeIn is_esi_related Is publication related to an ESI?
+#' @export
+is_pub_esi_related <- function(...) {
+  is_esi_related(...)
+}
 
 #' Operator overloading function
 #'
@@ -195,7 +296,7 @@ is_grant_esi_related<-function(tb=NULL) {
 #' @examples
 dispatch_on_field<-function(tb, name) {
   if ( is.null(tb))
-    sym(name)
+    rlang::sym(name)
   else
     dplyr::pull(tb, !!name)
 
@@ -204,67 +305,62 @@ dispatch_on_field<-function(tb, name) {
 
 
 
-
-
-#' Is investigator ESI?
+#' Does investigator have a target role
 #'
-#' The Early Stage Investigator is a particular category of investigator to report
-#' on. This returns the flag if this investigator is an ESI.
+#' @param role
+#' @param target
 #'
-#' @param role The Role of the investigator tibble
-#'
-#' @return A logical indicating if the investigator is an ESI.
+#' @return A logical indicating if the investigator is the role
 #' @export
 #'
-is_esi_investigator <- function(role) {
+#' @examples
+is_role <- function(role, target) {
   if (length(role) == 0)
     FALSE
   else
-    !is.na(role) & role == "ESI"
+    !is.na(role) & role == target
+}
+
+#' @describeIn is_role Is investigator ESI?
+#' @export
+is_esi_investigator <- function(role) is_role(role, "ESI")
+
+#' @describeIn is_role Is the role a New Investigator role?
+#' @export
+is_new_investigator<-function(role) is_role(role, "New Investigator")
+
+
+#' @describeIn is_role Is the role a trainee?
+#' @export
+is_trainee<-function(role) is_role(role, "Trainee")
+
+
+
+#' Extract tag
+#'
+#' @param .x
+#' @param tag
+#'
+#' @return
+#' @export
+#'
+#' @examples
+has_tag <- function(.x=NULL, tag) {
+  dispatch_on_field(.x, paste0("isTag_",tag))
 }
 
 
 
-
-
-#' Is the role a New Investigator role?
+#' Title
 #'
-#' Note this is vector-aware, so either a single value or a vector
-#' of investigators can be used.
+#' @param .x
 #'
-#' @param x The data to check for being new investigator(s)
-#'
-#' @return Logical value indicating if role is a new investigator.
+#' @return
 #' @export
 #'
 #' @examples
-is_new_investigator<-function(x) {
-
-  if (length(x)==0)
-    FALSE
-  else
-    !is.na(x) & x == "New Investigator"
-
-}
-
-
-#' Is the role a trainee?
-#'
-#' Note this is vector-aware, so either a single value or a vector of
-#' investigator roles can be used.
-#'
-#' @param x The data to check for being a trainee.
-#'
-#' @return Logical value indicating if role is a trainee.
-#' @export
-#'
-#' @examples
-is_trainee<-function(x) {
-
-  if (length(x)==0)
-    FALSE
-  else
-    !is.na(x) & x == "Trainee"
+list_tags <- function(.x) {
+  stringr::str_remove(stringr::str_subset(colnames(.x),"^isTag_"),"^isTag_")
 }
 
 

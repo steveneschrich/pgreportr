@@ -27,3 +27,4 @@
 #' @import assertthat
 #' @importFrom utils head tail
 NULL
+#> NULL
