@@ -107,3 +107,47 @@ count_esi_mentions_in_grant<-function(g) {
     dplyr::filter(is_esi_investigator(`Partnership Role`)) %>%
     nrow()
 }
+
+count_esi_mentions_in_pubs <- function(.x) {
+  .x %>%
+    expand_investigators() %>%
+    dplyr::filter(is_esi_investigator(`Partnership Role`)) %>%
+    nrow()
+}
+
+#' Title
+#'
+#' @param .x
+#' @param var
+#'
+#' @return
+#' @export
+#'
+#' @examples
+count_esi_mentions <- function(.x, var) {
+  sum(count_esi_creators(.x[[var]]))
+}
+
+
+#' Count the ESI's in a creator table
+#'
+#' @description In either a grant investigators or publication authors table, count
+#' the number of ESIs.
+#'
+#' @details A grant has a table of investigators and a publication has a table
+#' of authors. In either case, each creator can have a Partnership Role of
+#' ESI. This function will count the number of such ESI's for the grant/publication.
+#'
+#' @note Empty tables can be a little tricky, so there is special code to return
+#' a count of 0 if the table is empty.
+#'
+#' @param .x An investigator or author table
+#'
+#' @return The count of the number of ESI's
+#' @export
+#'
+#' @examples
+count_esi_creators <- function(.x) {
+  purrr::map_int(.x, ~dplyr::filter(.x, is_creator_esi(`Partnership Role`)) %>% nrow())
+}
+

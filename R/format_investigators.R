@@ -179,6 +179,28 @@ format_investigator_group_as_text<-function(investigators, label="",
 
 }
 
+
+#' Format authors as text chunks.
+#'
+#' Given an author table, format the output to include the list name
+#' and values as a text chunk.
+#'
+#' @details
+#'
+#'
+#' @param .x A table of authors
+#' @param collapse Character string between authors. Default is ', '
+#'
+#' @return
+#' @export
+#'
+#' @examples
+format_authors_as_text<-function(.x,  collapse=", ") {
+
+  stringr::str_c(.x$`Author Summary`, collapse = collapse)
+
+}
+
 #' Format a list of investigator flextable chunks.
 #'
 #' Given a list of possible grouped investigators as flextable chunks, format this into a
@@ -323,7 +345,26 @@ format_investigators<-function(investigators_list, format_investigator_group, co
   annotated_investigators
 }
 
+#' Title
+#'
+#' @param author_list
+#' @param format_authors_function
+#' @param ...
+#'
+#' @return
+#' @export
+#'
+#' @examples
+format_authors <- function(author_list, format_authors_function, ...) {
+  # Special case: if the author list is empty then return an empty
+  # string.
+  if (length(author_list)==1 & rlang::is_empty(author_list[[1]]))
+    return("")
 
+  annotated_authors<-purrr::map_chr(author_list, format_authors_function, ...)
+
+  annotated_authors
+}
 
 #' Format investigator name
 #'

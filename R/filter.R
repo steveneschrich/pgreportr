@@ -60,7 +60,7 @@ filter_grants_funded_between <- function(.x, ...) {
 #' @describeIn filter_between Filter publications published between dates
 #' @export
 filter_pubs_between <- function(.x, ...) {
-  filter_between(var = `Publication Date`, ...)
+  filter_between(.x, var = `Publication Date`, ...)
 }
 
 
@@ -154,6 +154,18 @@ filter_grants_submitted<-function(d) {
 #' @examples
 filter_grants_esi_related<-function(d) {
   dplyr::filter(d, !!is_grant_esi_related())
+}
+
+#' Title
+#'
+#' @param .x
+#'
+#' @return
+#' @export
+#'
+#' @examples
+filter_pubs_esi_related <- function(.x) {
+  dplyr::filter(.x, !!is_pub_esi_related())
 }
 
 #' Filter grant list to grants not funded.

@@ -231,6 +231,63 @@ style_grants_as_flextable_gamma<-function(d, ...) {
 }
 
 
+
+#' Title
+#'
+#' @details
+#' This function does no filtering to the table, but does the work of styling the
+#' table as a flextable. This can involve some heavy work, however, given the various
+#' ways in which styling requires post-processing.
+#'
+#' @param d
+#'
+#' @return
+#' @export
+#'
+#' @examples
+style_pubs_as_flextable_gamma<-function(d, ...) {
+  d %>%
+    dplyr::mutate(`Authors` = format_authors(authors,
+                                             format_authors_function=format_authors_as_text
+    )) %>%
+    dplyr::mutate(Citation = format_citation_as_text(.)) %>%
+    dplyr::select(`Citation`, `Publication Date`, `U54 Core Support`) %>%
+
+    # Add to flextable, this is likely to change.
+    flextable::flextable(col_keys=c("Citation", "Publication Date", "U54 Core Support"),
+
+                         cwidth=c(5, 1.5, 1.5)) %>%
+      # Add an extra header row for formatting
+    #flextable::add_header_row(top=TRUE,values=c(
+    #  "Date Submitted", "Grant Title", "Grant Agency", "Status",
+    #  "Funded","Investigators"),
+    #  colwidths=c(1,1,1,1,1,2,1)) %>%
+    #flextable::merge_h(1, part="header") %>%
+    #flextable::merge_v(j=1:5, part="header") %>%
+    #flextable::align(j = ~`Funded`, align="center", part="header") %>%
+
+    # Add ESI label
+  flextable::footnote(i = 1, j = 1, part = "header",
+                      value = flextable::as_paragraph(
+                        "Early Stage Investigator (ESI)"
+                      ),
+                      ref_symbols = c("[ESI]")
+  ) %>%
+    # Add Grant Status footnote.
+   # flextable::footnote(i = 1, j = 6, part = "header",
+   #                     value = flextable::as_paragraph(
+   #                      "Grant Status: F (Funded), NF (Not Funded), PR (Pending Review), IP (In Preparation)"
+   #                     ),
+   #                     ref_symbols = c("2")
+   # ) %>%
+
+    # Last thing should be apply the overall styling
+    apply_u54reportr_flextable_style()
+
+
+}
+
+
 #' Title
 #'
 #' @details
@@ -343,7 +400,32 @@ style_grants_as_text_beta<-function(grants, ...) {
   text_table
 }
 
+#' Format publications/authors as text-printable output
+#'
+#' @details
+#' The publications consist of many fields that
+#' can be compressed and rearranged for nice output. This function
+#' attempts to format the publications/authors in a way that is
+#' suitable for text-based output (e.g., a spreadsheet).
+#'
+#' @param .x The publications table
+#' @param ... Other parameters to pass to format_investigators.
+#' @return A formatted table with a subset of columns for printing.
+#' @export
+#'
+style_pubs_as_text_alpha<-function(.x, ...) {
+  if ( nrow(.x) == 0) return(.x)
 
+  text_table <- .x %>%
+    dplyr::rowwise() %>%
+    dplyr::mutate(`Authors` = format_authors(list(authors),
+                                             format_authors_function=format_authors_as_text,
+                                             ...
+    )) %>%
+    dplyr::select(`Authors`, tidyselect::everything())
+
+  text_table
+}
 
 #' Apply default style
 #'

@@ -363,4 +363,20 @@ list_tags <- function(.x) {
   stringr::str_remove(stringr::str_subset(colnames(.x),"^isTag_"),"^isTag_")
 }
 
-
+#' Title
+#'
+#' @param .x
+#'
+#' @return
+#' @export
+#'
+#' @examples
+is_creator_esi <- function(.x) {
+  .x == "ESI"
+}
+#' @describeIn is_creator_esi Is the author an ESI?
+#' @export
+is_author_esi <- function(.x) is_creator_esi(.x)
+#' @describeIn is_creator_esi Is the investigator an ESI?
+#' @export
+is_investigator_esi <- function(.x) is_creator_esi(.x)

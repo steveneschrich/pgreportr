@@ -2,7 +2,7 @@
 % Please edit documentation in R/expand_investigators.R
 \name{expand_investigators}
 \alias{expand_investigators}
-\title{Title}
+\title{Expand nested investigator fields}
 \usage{
 expand_investigators(d, ...)
 }
@@ -13,5 +13,19 @@ expand_investigators(d, ...)
 
 }
 \description{
-Title
+The Investigator field is a nested tibble. This function expands the nested tibble,
+creating multiple rows for the same grant with different investigators in each row.
+}
+\details{
+The \link[tidyr:nest]{tidyr::unnest} function provides the ability to nest a tibble within a tibble field.
+We use this to embed the investigator tibble into the grants tibble, so that filtering and counting
+will proceed as normal. This is one way to accomplish a relational set of tables.
+
+However, when we need access to this embedded tibble, we can do two different things.
+
+First, we can use purrr::map to iterate over the embedded tibbles.
+
+Second, we can expand the tibble into many tibbles.
+
+This function accomplishes the second option.
 }
