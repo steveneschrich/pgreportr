@@ -24,8 +24,10 @@ is the date a grant was submitted vs the date a grant was funded. These can ofte
 be years apart. This function takes both the year submitted (everyone has this) and
 the year funded (not everyone has this) and formats a combination of the two.
 
-The format of the output is\preformatted{YrSubmitted (YrFunded)
-}
+The format of the output is
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{YrSubmitted (YrFunded)
+}\if{html}{\out{</div>}}
 }
 \examples{
 

@@ -9,9 +9,6 @@ map_checkbox_index_to_label(s, dictionary)
 \arguments{
 \item{dictionary}{}
 }
-\value{
-
-}
 \description{
 Title
 }

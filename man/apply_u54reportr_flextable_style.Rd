@@ -9,9 +9,6 @@ apply_u54reportr_flextable_style(table)
 \arguments{
 \item{table}{}
 }
-\value{
-
-}
 \description{
 This is a temporary hack until I figure out flextable themes.
 }

@@ -9,9 +9,6 @@
 \arguments{
 \item{pl}{}
 }
-\value{
-
-}
 \description{
 Title
 }

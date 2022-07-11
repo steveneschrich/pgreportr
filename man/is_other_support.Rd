@@ -15,9 +15,6 @@ is_pub_other_support(.x)
 \arguments{
 \item{.x}{}
 }
-\value{
-
-}
 \description{
 Title
 }

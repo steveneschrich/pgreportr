@@ -9,9 +9,6 @@ count_esi_mentions(.x, var)
 \arguments{
 \item{var}{}
 }
-\value{
-
-}
 \description{
 Title
 }

@@ -9,9 +9,6 @@ filter_by_support(.x, support)
 \arguments{
 \item{support}{}
 }
-\value{
-
-}
 \description{
 Title
 }

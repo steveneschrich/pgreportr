@@ -9,9 +9,6 @@ filter_by_tag(.x, tag)
 \arguments{
 \item{tag}{}
 }
-\value{
-
-}
 \description{
 Title
 }

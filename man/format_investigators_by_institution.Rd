@@ -15,9 +15,6 @@ format_investigators_by_institution(
 \arguments{
 \item{summary_field}{What field to use for the investigator (defaults to \verb{Investigator Summary})}
 }
-\value{
-
-}
 \description{
 Given a list of investigator tibbles, format the investigators of each tibble by grouping.
 }

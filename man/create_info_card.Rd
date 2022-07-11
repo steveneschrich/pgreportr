@@ -11,9 +11,6 @@ create_info_card(.x, tag)
 
 \item{tag}{The tag for the \verb{tag column,}}
 }
-\value{
-
-}
 \description{
 Create a info card, which is a plot taking the whole screen, based on
 the input table \code{.x} and field \code{tag}.

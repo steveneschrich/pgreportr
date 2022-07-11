@@ -14,9 +14,6 @@ format_investigators(
 \arguments{
 \item{...}{}
 }
-\value{
-
-}
 \description{
 Title
 }

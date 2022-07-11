@@ -9,9 +9,6 @@ filter_pubs_esi_related(.x)
 \arguments{
 \item{.x}{}
 }
-\value{
-
-}
 \description{
 Title
 }

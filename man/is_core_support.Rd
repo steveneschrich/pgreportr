@@ -15,9 +15,6 @@ is_pub_core_support(.x)
 \arguments{
 \item{.x}{}
 }
-\value{
-
-}
 \description{
 Title
 }

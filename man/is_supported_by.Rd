@@ -15,9 +15,6 @@ is_pub_supported_by(.x, ...)
 \arguments{
 \item{support}{}
 }
-\value{
-
-}
 \description{
 Title
 }

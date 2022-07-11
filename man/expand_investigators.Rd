@@ -9,9 +9,6 @@ expand_investigators(d, ...)
 \arguments{
 \item{d}{}
 }
-\value{
-
-}
 \description{
 The Investigator field is a nested tibble. This function expands the nested tibble,
 creating multiple rows for the same grant with different investigators in each row.

@@ -9,9 +9,6 @@ format_date_as_month_year(d)
 \arguments{
 \item{d}{}
 }
-\value{
-
-}
 \description{
 Title
 }

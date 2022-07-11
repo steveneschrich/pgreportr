@@ -9,17 +9,16 @@ map_checkbox_choice(.x, .choices)
 \arguments{
 \item{.choices}{}
 }
-\value{
-
-}
 \description{
 A checkbox choice is a field that can be either Checked
 or Unchecked. Transform this entry to the corresponding label text.
 }
 \details{
 In REDCap, a checkbox is represented as a series of fields
-with the choice index appended. That is, it is of the form\preformatted{checkbox___1
-}
+with the choice index appended. That is, it is of the form
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{checkbox___1
+}\if{html}{\out{</div>}}
 
 The data dictionary (metadata) provides a lookup of what 1 is labeled. The
 content of the field is NA, Checked or Unchecked.

@@ -11,13 +11,7 @@ format_authors_as_text(.x, collapse = ", ")
 
 \item{collapse}{Character string between authors. Default is ', '}
 }
-\value{
-
-}
 \description{
 Given an author table, format the output to include the list name
 and values as a text chunk.
-}
-\details{
-
 }

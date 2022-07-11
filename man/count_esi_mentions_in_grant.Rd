@@ -9,9 +9,6 @@ count_esi_mentions_in_grant(g)
 \arguments{
 \item{g}{}
 }
-\value{
-
-}
 \description{
 Title
 }

@@ -9,9 +9,6 @@ filter_grants_funded(d)
 \arguments{
 \item{d}{}
 }
-\value{
-
-}
 \description{
 Title
 }

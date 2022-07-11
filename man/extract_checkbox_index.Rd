@@ -9,9 +9,6 @@ extract_checkbox_index(s)
 \arguments{
 \item{s}{}
 }
-\value{
-
-}
 \description{
 Title
 }

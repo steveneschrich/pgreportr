@@ -9,9 +9,6 @@ has_tag(.x = NULL, tag)
 \arguments{
 \item{tag}{}
 }
-\value{
-
-}
 \description{
 Extract tag
 }

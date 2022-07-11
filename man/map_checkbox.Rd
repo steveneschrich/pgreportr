@@ -9,9 +9,6 @@ map_checkbox(.x, dictionary, target, prefix = "manu_supported_cores")
 \arguments{
 \item{prefix}{}
 }
-\value{
-
-}
 \description{
 Map a checkbox variable into levels
 }

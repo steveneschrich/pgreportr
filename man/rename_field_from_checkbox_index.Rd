@@ -9,9 +9,6 @@ rename_field_from_checkbox_index(x, dictionary)
 \arguments{
 \item{dictionary}{}
 }
-\value{
-
-}
 \description{
 Title
 }

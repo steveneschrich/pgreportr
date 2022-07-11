@@ -45,11 +45,15 @@ The degree (in the form of ,degree) is another variation. This code handles it's
 or absence. You can use the use_degree flag to print it out (or not).
 
 So, for instance
-in the case of\preformatted{     John James Smith
-}
+in the case of
 
-his formatted name would be\preformatted{     JJ. Smith
-}
+\if{html}{\out{<div class="sourceCode">}}\preformatted{     John James Smith
+}\if{html}{\out{</div>}}
+
+his formatted name would be
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{     JJ. Smith
+}\if{html}{\out{</div>}}
 
 Note that this function supports either a single name or a vector of names, and will transform
 accordingly.

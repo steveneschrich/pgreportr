@@ -9,9 +9,6 @@ read_redcap_data_online(uri, token)
 \arguments{
 \item{token}{}
 }
-\value{
-
-}
 \description{
 Using the REDCapR library, import the raw and labeled versions of
 a project. Also download the data dictionary.

@@ -9,9 +9,6 @@ report_joint_grants_as_flextable(grants, ...)
 \arguments{
 \item{d}{A grant table}
 }
-\value{
-
-}
 \description{
 Given a tibble associated with selected grants, format the tibble as a
 flextable object to insert into an Office document. This particular function

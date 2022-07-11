@@ -9,9 +9,6 @@ format_authors(author_list, format_authors_function, ...)
 \arguments{
 \item{...}{}
 }
-\value{
-
-}
 \description{
 Title
 }

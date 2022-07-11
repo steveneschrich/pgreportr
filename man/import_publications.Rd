@@ -9,9 +9,6 @@ import_publications(uri, token)
 \arguments{
 \item{token}{}
 }
-\value{
-
-}
 \description{
 Import publications from REDCap database
 }

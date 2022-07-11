@@ -9,9 +9,6 @@ style_grants_as_flextable_gamma(d, ...)
 \arguments{
 \item{d}{}
 }
-\value{
-
-}
 \description{
 Title
 }

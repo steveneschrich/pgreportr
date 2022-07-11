@@ -9,9 +9,6 @@ style_grants_as_text_beta(grants, ...)
 \arguments{
 \item{...}{}
 }
-\value{
-
-}
 \description{
 Title
 }

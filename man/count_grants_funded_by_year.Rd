@@ -11,9 +11,6 @@ count_grants_funded_by_year(d)
 \arguments{
 \item{yr}{}
 }
-\value{
-
-}
 \description{
 Count funded submissions
 This has some subtlety. We need to actually consider the year it is funded, as opposed

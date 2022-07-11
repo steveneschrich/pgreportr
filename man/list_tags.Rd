@@ -9,9 +9,6 @@ list_tags(.x)
 \arguments{
 \item{.x}{}
 }
-\value{
-
-}
 \description{
 Title
 }

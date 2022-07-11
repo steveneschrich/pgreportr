@@ -9,9 +9,6 @@ get_field_choices(dictionary, field)
 \arguments{
 \item{field}{}
 }
-\value{
-
-}
 \description{
 Return the choices for a field
 }

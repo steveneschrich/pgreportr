@@ -9,9 +9,6 @@ filter_supported(.x, var)
 \arguments{
 \item{.x}{}
 }
-\value{
-
-}
 \description{
 Title
 }

@@ -15,9 +15,6 @@ filter_grants_moffitt_health_disparities(.x)
 \arguments{
 \item{.x}{}
 }
-\value{
-
-}
 \description{
 Filter grants based on Moffitt Health Disparities
 }

@@ -16,9 +16,6 @@ format_investigator_group_as_text(
 \arguments{
 \item{i}{The investigator group}
 }
-\value{
-
-}
 \description{
 Given an investigator group, format the output to include the list name
 and values as a text chunk.

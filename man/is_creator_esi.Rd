@@ -15,9 +15,6 @@ is_investigator_esi(.x)
 \arguments{
 \item{.x}{}
 }
-\value{
-
-}
 \description{
 Title
 }

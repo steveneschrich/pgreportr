@@ -9,9 +9,6 @@
 \arguments{
 \item{.x}{}
 }
-\value{
-
-}
 \description{
 This function provides a way, in mutate, to test if any
 of the authors are ESI's.

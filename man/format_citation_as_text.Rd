@@ -9,9 +9,6 @@ format_citation_as_text(.x)
 \arguments{
 \item{.x}{}
 }
-\value{
-
-}
 \description{
 Title
 }

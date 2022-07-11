@@ -26,6 +26,3 @@ year. This works since each year is tested in increasing order.
 Note that dates starting earlier than Y01 start date are considered
 Y00.
 }
-\examples{
-
-}
