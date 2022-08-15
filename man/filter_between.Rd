@@ -40,10 +40,10 @@ Note that the dates are inclusive (meaning they include the date specified).
 }
 \section{Functions}{
 \itemize{
-\item \code{filter_grants_submitted_between}: Filter grants submitted between dates
+\item \code{filter_grants_submitted_between()}: Filter grants submitted between dates
 
-\item \code{filter_grants_funded_between}: Filter grants funded between dates
+\item \code{filter_grants_funded_between()}: Filter grants funded between dates
 
-\item \code{filter_pubs_between}: Filter publications published between dates
+\item \code{filter_pubs_between()}: Filter publications published between dates
+
 }}
-

@@ -23,8 +23,8 @@ This filter will reduce the table to those entries that are PHSU Cancer related
 }
 \section{Functions}{
 \itemize{
-\item \code{filter_pub_phsu_cancer_related}: Filter pubs on  PHSU Cancer-related
+\item \code{filter_pub_phsu_cancer_related()}: Filter pubs on  PHSU Cancer-related
 
-\item \code{filter_grants_phsu_cancer_related}: Filter grants on PHSU Cancer-related
+\item \code{filter_grants_phsu_cancer_related()}: Filter grants on PHSU Cancer-related
+
 }}
-

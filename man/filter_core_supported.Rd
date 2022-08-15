@@ -23,8 +23,8 @@ Filter table on those with any core support.
 }
 \section{Functions}{
 \itemize{
-\item \code{filter_grants_core_supported}: Filter grants with core support
+\item \code{filter_grants_core_supported()}: Filter grants with core support
 
-\item \code{filter_pubs_core_supported}: Filter pubs with core support
+\item \code{filter_pubs_core_supported()}: Filter pubs with core support
+
 }}
-

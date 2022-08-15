@@ -40,10 +40,10 @@ included.
 }
 \section{Functions}{
 \itemize{
-\item \code{filter_grants_submitted_in_year}: Filter grants submitted in year
+\item \code{filter_grants_submitted_in_year()}: Filter grants submitted in year
 
-\item \code{filter_grants_funded_in_year}: Filter grants with funding starting in PG year yr.
+\item \code{filter_grants_funded_in_year()}: Filter grants with funding starting in PG year yr.
 
-\item \code{filter_pubs_in_year}: Filter publications in Partnership Grant year yr
+\item \code{filter_pubs_in_year()}: Filter publications in Partnership Grant year yr
+
 }}
-

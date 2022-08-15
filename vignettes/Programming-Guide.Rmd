@@ -15,11 +15,11 @@ knitr::opts_chunk$set(
 ```
 
 ```{r setup}
-library(u54reportr)
+library(pgreportr)
 ```
 
 # grants tibble
-The main interface to activities within u54reportr is the tibble containing the grant information. This is created by `import-redcap-data()`, which loads REDCap data (obviously) and performs a variety of actions, including:
+The main interface to activities within pgreportr is the tibble containing the grant information. This is created by `import-redcap-data()`, which loads REDCap data (obviously) and performs a variety of actions, including:
 
 - adding indicator variables for conditions
 - removing extraneous variables

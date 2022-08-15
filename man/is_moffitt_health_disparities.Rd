@@ -17,6 +17,6 @@ Title
 }
 \section{Functions}{
 \itemize{
-\item \code{is_pub_moffitt_health_disparities}: Is publication Moffitt Health-Disparities related
-}}
+\item \code{is_pub_moffitt_health_disparities()}: Is publication Moffitt Health-Disparities related
 
+}}

@@ -20,8 +20,8 @@ Title
 }
 \section{Functions}{
 \itemize{
-\item \code{is_grant_supported_by}: Is grant supported by a resource?
+\item \code{is_grant_supported_by()}: Is grant supported by a resource?
 
-\item \code{is_pub_supported_by}: Is publication supported by a resource?
+\item \code{is_pub_supported_by()}: Is publication supported by a resource?
+
 }}
-

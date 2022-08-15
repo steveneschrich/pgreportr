@@ -29,8 +29,8 @@ field are ESI-related or not (or the field name if tb is not included).
 }
 \section{Functions}{
 \itemize{
-\item \code{is_grant_esi_related}: Is grant related to an ESI?
+\item \code{is_grant_esi_related()}: Is grant related to an ESI?
 
-\item \code{is_pub_esi_related}: Is publication related to an ESI?
+\item \code{is_pub_esi_related()}: Is publication related to an ESI?
+
 }}
-

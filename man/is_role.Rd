@@ -26,10 +26,10 @@ Does investigator have a target role
 }
 \section{Functions}{
 \itemize{
-\item \code{is_esi_investigator}: Is investigator ESI?
+\item \code{is_esi_investigator()}: Is investigator ESI?
 
-\item \code{is_new_investigator}: Is the role a New Investigator role?
+\item \code{is_new_investigator()}: Is the role a New Investigator role?
 
-\item \code{is_trainee}: Is the role a trainee?
+\item \code{is_trainee()}: Is the role a trainee?
+
 }}
-

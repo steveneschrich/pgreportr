@@ -20,8 +20,8 @@ Filter grants based on Moffitt Health Disparities
 }
 \section{Functions}{
 \itemize{
-\item \code{filter_pub_moffitt_health_disparities}: Filter grants on Moffitt Health Disparities
+\item \code{filter_pub_moffitt_health_disparities()}: Filter grants on Moffitt Health Disparities
 
-\item \code{filter_grants_moffitt_health_disparities}: Filter grants on Moffitt Health Disparities
+\item \code{filter_grants_moffitt_health_disparities()}: Filter grants on Moffitt Health Disparities
+
 }}
-

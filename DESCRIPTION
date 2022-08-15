@@ -1,6 +1,6 @@
 Package: pgreportr
 Title: NIH Program Grant Reporting Library
-Version: 0.0.0.9001
+Version: 0.0.0.9002
 Authors@R: 
     person(given = "Steven",
            family = "Eschrich",
@@ -18,7 +18,7 @@ License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.0
+RoxygenNote: 7.2.1
 Imports: 
   purrr,
   dplyr,
@@ -32,7 +32,14 @@ Imports:
   tibble,
   officer,
   rmarkdown,
-  here
+  here,
+  REDCapR,
+  checkmate,
+  ggplot2,
+  ggtext,
+  glue,
+  magrittr,
+  xfun
 Suggests: 
     testthat (>= 3.0.0),
     knitr,

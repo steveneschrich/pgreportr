@@ -20,8 +20,8 @@ Title
 }
 \section{Functions}{
 \itemize{
-\item \code{is_grant_other_support}: Is grant supported by other support
+\item \code{is_grant_other_support()}: Is grant supported by other support
 
-\item \code{is_pub_other_support}: Is pub supported by other support
+\item \code{is_pub_other_support()}: Is pub supported by other support
+
 }}
-

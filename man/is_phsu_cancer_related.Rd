@@ -25,8 +25,8 @@ field are PHSU Cancer-related or not (or the field name if .x  is not included).
 }
 \section{Functions}{
 \itemize{
-\item \code{is_pub_phsu_cancer_related}: Is publication PHSU Cancer-related
+\item \code{is_pub_phsu_cancer_related()}: Is publication PHSU Cancer-related
 
-\item \code{is_grant_phsu_cancer_related}: Is grant PHSU Cancer-related
+\item \code{is_grant_phsu_cancer_related()}: Is grant PHSU Cancer-related
+
 }}
-

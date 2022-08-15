@@ -20,8 +20,8 @@ Title
 }
 \section{Functions}{
 \itemize{
-\item \code{is_author_esi}: Is the author an ESI?
+\item \code{is_author_esi()}: Is the author an ESI?
 
-\item \code{is_investigator_esi}: Is the investigator an ESI?
+\item \code{is_investigator_esi()}: Is the investigator an ESI?
+
 }}
-
