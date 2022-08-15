@@ -49,7 +49,7 @@ import_publications <- function(uri, token) {
     dplyr::rename(pub_id=.data$record_id) %>%
 
     # Creating a lubridate-supported date allows arithmetic
-    dplyr::mutate(`Publication Date`=lubridate::ymd(.data$date_publication),
+    dplyr::mutate(`Publication Date`=lubridate::ymd(.data$date_publication, truncated=1),
                   date_publication=NULL) %>%
 
     # The Partnership Grant has fiscal years. Assign grant years.
