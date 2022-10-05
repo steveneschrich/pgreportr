@@ -38,6 +38,8 @@ NULL
 #' @export
 #' @examples
 filter_between <- function(.x, var, start, end = format(Sys.time(), '%Y%m%d')) {
+  if ( nrow(.x) == 0 ) return(.x)
+
   dplyr::filter(.x, {{ var }} %within% lubridate::interval(start,end))
 }
 
