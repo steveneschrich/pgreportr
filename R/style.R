@@ -444,3 +444,91 @@ apply_u54reportr_flextable_style<-function(table) {
     flextable::fontsize(size=8, part = "all")
 }
 
+
+
+
+
+#' A styling function for publications
+#'
+#' @details
+#' This function does no filtering to the table, but does the work of styling the
+#' table as a flextable. This can involve some heavy work, however, given the various
+#' ways in which styling requires post-processing.
+#'
+#' The flextable (and text) styles are listed by alpha, delta, to distinguish them
+#' as we are determining the best formatting approach.
+#'
+#' @param d A data frame of publications
+#'
+#' @return A flextable consisting of formatted publication entries.
+#' @export
+#'
+#' @examples
+style_pubs_as_flextable_delta<-function(d, ...) {
+  tbl <- d |>
+    # Add in a publication number (specific to this data).
+    dplyr::mutate(`Citation Number`=dplyr::row_number())
+
+  # Create a flextable. Define the specific columns to use in the table here, even
+  # if the columns do not exist in the source data (we can add formatting to a new
+  # column during formatting).
+  ft <- flextable::flextable(
+    tbl,
+    col_keys=c(
+      "Publication Year",
+      "Citation Number",
+      "Formatted Reference",
+      "Publication Date",
+      "U54 Core Support")
+  )
+
+  # The reference is actually a composite of many different columns, composed into
+  # a single flextable cell (as a formatted paragraph). This is rather complex, but
+  # the flextable::compose is used to store the results into the empty column we
+  # created "Formatted Reference" for printing.
+  ft <- flextable::compose(
+    ft,
+    j = "Formatted Reference",
+    # This should eventually be a function call in tidy select setup.
+    value = format_publications_as_flextable(ft$body$dataset)
+  )
+
+  # The cell text should now all be present in the table. Next step is
+  # to apply formatting (alignment, padding, etc) to it.
+  ft <- ft |>
+    # Define column widths. This should agree with the number of columns in the table.
+    flextable::width(width = c(0.25, 0.25, 5,1.5,1.5)) |>
+    # Center content
+    flextable::align(j = c("Publication Year","Citation Number"), align="center") |>
+    # Remove extra space in small columns
+    flextable::padding(
+      j = c("Publication Year", "Citation Number"),
+      padding.left=0,padding.right=0
+    ) |>
+
+    # Add footnotes for annotation.
+    flextable::add_footer_lines(values = c("L1","L2","L3")) |>
+    flextable::compose(
+      i=1,j=1, part = "footer",
+      value = flextable::as_paragraph(
+        flextable::as_b(flextable::as_sup("*")),
+        flextable::as_b(" Partnership member"))) |>
+    flextable::compose(
+      i=2,j=1, part= "footer",
+      value = flextable::as_paragraph(
+        flextable::as_b("REC Trainee") |> dplyr::mutate(underlined=TRUE))
+    ) |>
+    flextable::compose(
+      i=3, j=1, part="footer",
+      value = flextable::as_paragraph(
+        flextable::as_b("[ESI] Early Stage Investigator"))
+    ) |>
+
+
+    # Last thing should be apply the overall styling
+    apply_u54reportr_flextable_style()
+
+
+  ft
+}
+

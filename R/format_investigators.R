@@ -180,26 +180,7 @@ format_investigator_group_as_text<-function(investigators, label="",
 }
 
 
-#' Format authors as text chunks.
-#'
-#' Given an author table, format the output to include the list name
-#' and values as a text chunk.
-#'
-#' @details
-#'
-#'
-#' @param .x A table of authors
-#' @param collapse Character string between authors. Default is ', '
-#'
-#' @return
-#' @export
-#'
-#' @examples
-format_authors_as_text<-function(.x,  collapse=", ") {
 
-  stringr::str_c(.x$`Author Summary`, collapse = collapse)
-
-}
 
 #' Format a list of investigator flextable chunks.
 #'
@@ -345,26 +326,7 @@ format_investigators<-function(investigators_list, format_investigator_group, co
   annotated_investigators
 }
 
-#' Title
-#'
-#' @param author_list
-#' @param format_authors_function
-#' @param ...
-#'
-#' @return
-#' @export
-#'
-#' @examples
-format_authors <- function(author_list, format_authors_function, ...) {
-  # Special case: if the author list is empty then return an empty
-  # string.
-  if (length(author_list)==1 & rlang::is_empty(author_list[[1]]))
-    return("")
 
-  annotated_authors<-purrr::map_chr(author_list, format_authors_function, ...)
-
-  annotated_authors
-}
 
 #' Format investigator name
 #'
@@ -412,7 +374,7 @@ format_authors <- function(author_list, format_authors_function, ...) {
 #' @export
 #'
 #'
-format_investigator_name<-function(n, use_degree=TRUE, use_first_name_only=FALSE,
+format_name<-function(n, use_degree=TRUE, use_first_name_only=FALSE,
                                    use_initials=TRUE, use_period_after_initials=TRUE,
                                    use_last_name_first=FALSE, ...) {
   # Name should be of the form
@@ -482,6 +444,12 @@ format_investigator_name<-function(n, use_degree=TRUE, use_first_name_only=FALSE
     name
 }
 
+#' @describeIn format_name Format investigator
+format_investigator_name <- function(...) {
+  format_name(...)
+}
 
-
-
+#' @describeIn format_name Format author
+format_author_name <- function(...) {
+  format_name(...)
+}

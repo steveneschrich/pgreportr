@@ -55,13 +55,12 @@ split_date_range<-function(s) {
 #' @export
 #'
 paste_noNA<-function(v1, v2, sep=", ") {
-  dplyr::bind_cols(v1=v1, v2=v2) %>%
-    dplyr::mutate(
-      v1 = dplyr::na_if(v1, ""),
-      v2 = dplyr::na_if(v2, "")) %>%
-    tidyr::unite(newname, v1, v2, na.rm=TRUE, sep=sep) %>%
-    dplyr::pull(newname)
-
+  if ( is.na(v1) || v1=="" )
+    v2
+  else if (is.na(v2) || v2=="")
+    v1
+  else
+    paste(v1,v2,sep=sep)
 }
 
 

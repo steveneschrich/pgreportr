@@ -19,7 +19,7 @@ import_publications <- function(uri, token) {
   pub_table <- dplyr::nest_join(pubs, authors, by="pub_id", name = "authors")
 
   # Add indicators for various conditions requiring both tables.
-  pub_table <- pub_table %>%
+  pub_table <- pub_table |>
     dplyr::mutate(
       is_esi_related = .is_esi_related(authors),
       is_support = !is.na(`U54 Support`),
@@ -42,36 +42,40 @@ import_publications <- function(uri, token) {
 #'
 #' @examples
 .create_publication_table <- function(pl) {
-  pubs<- pl$label %>%
-    .remove_authors() %>%
+  pubs<- pl$label |>
+    .remove_authors_from_redcap_table() |>
 
     # Rename variables for easier use
-    dplyr::rename(pub_id=.data$record_id) %>%
+    dplyr::rename(pub_id=.data$record_id) |>
 
     # Creating a lubridate-supported date allows arithmetic
     dplyr::mutate(`Publication Date`=lubridate::ymd(.data$date_publication, truncated=1),
-                  date_publication=NULL) %>%
+                  date_publication=NULL) |>
+
+    # Based on the publication date, extract just the year of publication
+    dplyr::mutate(`Publication Year`=as.character(lubridate::year(`Publication Date`))) |>
 
     # The Partnership Grant has fiscal years. Assign grant years.
-    dplyr::mutate(`U54 Year Published`=.pg_year(`Publication Date`)) %>%
+    dplyr::mutate(`U54 Year Published`=.pg_year(`Publication Date`)) |>
+
 
     # Convert checkbox to flag variables.
     .convert_checkbox_to_flags(
       raw_prefix = "manu_supported_cores",
       indicator_prefix = "isSupportedBy",
       dictionary = pl$dictionary
-    ) %>%
+    ) |>
 
     # Create consolidated fields (comma-separated)
     tidyr::unite(col = "U54 Core Support", sep = ", ", remove = FALSE, na.rm = TRUE,
                  paste0("manu_supported_cores___",
-                        u54_cores)) %>%
+                        u54_cores)) |>
     tidyr::unite(col = "U54 Other Support", sep = ", ", remove = FALSE, na.rm = TRUE,
                  paste0("manu_supported_cores___",
-                        u54_othersupport)) %>%
+                        u54_othersupport)) |>
     tidyr::unite(col = "U54 Support", sep = ", ", remove = FALSE, na.rm = TRUE,
                  paste0("manu_supported_cores___",
-                        u54_support)) %>%
+                        u54_support)) |>
 
 
     # Convert checkbox to flag variables.
@@ -80,7 +84,7 @@ import_publications <- function(uri, token) {
       indicator_prefix = "isTag",
       dictionary = pl$dictionary
 
-    ) %>%
+    ) |>
 
     # Create consolidated fields (comma-separated)
     tidyr::unite(col = "Tags", sep = ", ", remove = FALSE, na.rm = TRUE,
@@ -105,9 +109,9 @@ import_publications <- function(uri, token) {
 #' @examples
 .create_authors_table<-function(pl) {
 
-  pl$label %>%
+  pl$label |>
     # Start by filtering on having a redcap_repeat_instrument (meaning is has authors)
-    .remove_pubs() %>%
+    .remove_pubs_from_redcap_table() |>
     # Rename fields to human-readable form.
     dplyr::rename(
       `Author` = .data$author_name,
@@ -115,11 +119,11 @@ import_publications <- function(uri, token) {
       `Partnership Role` = .data$author_partnership_role,
       pub_id = record_id,
       author_id = redcap_repeat_instance
-    ) %>%
+    ) |>
     # Remove redcap indicator field
-    dplyr::select(-authors_complete) %>%
+    dplyr::select(-authors_complete) |>
     # NA the None role, so it's not printed.
-    dplyr::mutate(`Partnership Role` = dplyr::na_if(`Partnership Role`, "None")) %>%
+    dplyr::mutate(`Partnership Role` = dplyr::na_if(`Partnership Role`, "None")) |>
     # Create author summary text for printing
     dplyr::mutate(`Author Summary` = .derive_creator_summary(Author, `Partnership Role`))
 
@@ -140,11 +144,11 @@ import_publications <- function(uri, token) {
 #' @importFrom dplyr %>%
 #'
 #' @examples
-.remove_pubs<-function(.x) {
+.remove_pubs_from_redcap_table<-function(.x) {
 
-  .x %>%
+  .x |>
     # Remove publication rows (keep repeat instruments)
-    dplyr::filter(.data$redcap_repeat_instrument == "Authors") %>%
+    dplyr::filter(.data$redcap_repeat_instrument == "Authors") |>
     # Keep author columns
     dplyr::select(tidyselect::starts_with("author"),
                   record_id,
@@ -164,14 +168,13 @@ import_publications <- function(uri, token) {
 #' @return A modified tibble with publication entries removed.
 #'
 #' @importFrom rlang .data
-#' @importFrom dplyr %>%
 #'
 #' @examples
-.remove_authors<-function(.x) {
+.remove_authors_from_redcap_table<-function(.x) {
 
-  .x %>%
+  .x |>
     # Remove author rows (exclude repeat instruments)
-    dplyr::filter(is.na(.data$redcap_repeat_instrument)) %>%
+    dplyr::filter(is.na(.data$redcap_repeat_instrument)) |>
     # Remove author columns
     dplyr::select(-tidyselect::starts_with("author"),
                   -redcap_repeat_instance
