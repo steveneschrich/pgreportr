@@ -317,9 +317,9 @@ format_investigators<-function(investigators_list, format_investigator_group, co
     return("")
 
   annotated_investigators<-purrr::map_chr(investigators_list, function(investigators) {
-    investigators %>%
-      arrange_investigators_by_role() %>%
-      dplyr::group_map(format_investigator_group,...) %>%
+    investigators |>
+      arrange_investigators_by_role() |>
+      dplyr::group_map(format_investigator_group,...) |>
       combine_investigator_groups()
   })
 
