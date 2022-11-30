@@ -505,6 +505,8 @@ style_pubs_as_flextable_delta<-function(d, ...) {
       j = c("Publication Year", "Citation Number"),
       padding.left=0,padding.right=0
     ) |>
+    # Justify the publication
+    flextable::align(j="Formatted Reference", align = "justify") |>
 
     # Add footnotes for annotation.
     flextable::add_footer_lines(values = c("L1","L2","L3")) |>
