@@ -55,12 +55,17 @@ split_date_range<-function(s) {
 #' @export
 #'
 paste_noNA<-function(v1, v2, sep=", ") {
-  if ( is.na(v1) || v1=="" )
-    v2
-  else if (is.na(v2) || v2=="")
-    v1
-  else
-    paste(v1,v2,sep=sep)
+
+  v1 <- replace(v1, is.na(v1), "")
+  v2 <- replace(v2, is.na(v2),  "")
+
+  x <- dplyr::case_when(
+    v1 == "" ~ v2,
+    v2 == "" ~ v1,
+    TRUE ~ paste(v1, v2, sep=sep)
+  )
+
+  x
 }
 
 
