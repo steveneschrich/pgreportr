@@ -75,9 +75,7 @@ paste_noNA<-function(v1, v2, sep=", ") {
 #' @export
 #'
 #'
-datestamp<-function() {
-  format(Sys.time(),'%Y%m%d')
-}
+datestamp<-lubridate::today
 
 
 

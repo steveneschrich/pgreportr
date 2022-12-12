@@ -193,34 +193,36 @@ import_grants<-function(uri, token) {
 #' @examples
 .create_investigators_table<-function(gl) {
 
-  gl$label %>%
-    .remove_grants() %>%
+  gl$label |>
+    .remove_grants() |>
 
     # Each of these fields has an "Other" option, so we coalesce.
     dplyr::mutate(`Investigator` = dplyr::coalesce(
-      !!! dplyr::select(., .data$investigator_other, .data$investigator_name))
-    ) %>%
+      .data$investigator_other, .data$investigator_name
+    )) |>
 
     dplyr::mutate(`Role` = dplyr::coalesce(
-      !!! dplyr::select(., role_other, investigator_role))
-    ) %>%
+      .data$role_other, .data$investigator_role
+    )) |>
 
     dplyr::mutate(`Institution` = dplyr::coalesce(
-      !!! dplyr::select(., institution_other, investigator_institution))
-    ) %>%
+      .data$institution_other, .data$investigator_institution
+    )) |>
 
     dplyr::mutate(`Partnership Role` = dplyr::coalesce(
-      !!! dplyr::select(., partnership_role_other, investigator_partnership_role))
-    ) %>%
+      .data$partnership_role_other, .data$investigator_partnership_role
+    )) |>
 
     # Clean up remaining variables.
-    dplyr::rename(grant_id=record_id,
-                  investigator_id=redcap_repeat_instance) %>%
+    dplyr::rename(
+      grant_id=record_id,
+      investigator_id=redcap_repeat_instance
+    ) |>
 
     dplyr::mutate(`Role` = dplyr::recode(`Role`,
                                   "Principal Investigator" = "PI",
                                   "Co-Investigator" = "co-I"
-    )) %>%
+    )) |>
 
     dplyr::mutate(`Investigator Summary` = .derive_creator_summary(
       Investigator, `Partnership Role`, `Role`
