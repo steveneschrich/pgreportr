@@ -296,7 +296,6 @@ style_grants_as_flextable_epsilon<-function(d, ...) {
     # Set alignments, style for columns
     flextable::set_header_labels(`Investigators`="Investigators") |>
     flextable::italic(j= ~`Title`, part="body") |>
-    flextable::bold(j= ~`Grant Type`, part="body") |>
 
     # Add an extra header row for formatting
     #flextable::add_header_row(top=TRUE,values=c(
