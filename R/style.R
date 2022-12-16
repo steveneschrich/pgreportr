@@ -251,7 +251,6 @@ style_grants_as_flextable_epsilon<-function(d, ...) {
       `planned_date_of_submission`=lubridate::ymd(`planned_date_of_submission`),
       `Submission Date` = dplyr::coalesce(`Submission Date`, `planned_date_of_submission`),
       ESI = ifelse(is_esi_related, "ESI-related",""),
-      `Grant Year` = lubridate::year(`Submission Date`),
       `Grant Status` =
         dplyr::case_when(
           `Grant Status` == "Funded" ~"F",
@@ -262,7 +261,7 @@ style_grants_as_flextable_epsilon<-function(d, ...) {
     ) |>
     dplyr::select(
       `Grant Number`,
-      `Grant Year`,
+      `U54 Year`,
       Source,
       investigators,
       Title,
@@ -273,7 +272,7 @@ style_grants_as_flextable_epsilon<-function(d, ...) {
     # Add to flextable, this is likely to change.
     flextable::flextable(
       col_keys=c(
-        "Grant Number","Grant Year","Source","Investigators","Title","Grant Status",
+        "Grant Number","U54 Year","Source","Investigators","Title","Grant Status",
         "ESI", "investigators"
       ),
 
@@ -319,6 +318,21 @@ style_grants_as_flextable_epsilon<-function(d, ...) {
                           "Grant Status: F (Funded), NF (Not Funded), PR (Pending Review), IP (In Preparation)"
                         ),
                         ref_symbols = c("2")
+    ) |>
+    flextable::footnote(i = 1, j = 2, part = "header",
+                        value = flextable::as_paragraph(
+                          "U54 Year Submitted (Funded)\n",
+                            dplyr::select(d, "U54 Year") |>
+                              dplyr::filter(!stringr::str_detect(`U54 Year`, "\\(")) |>
+                              dplyr::distinct() |>
+                              dplyr::left_join(pg_grant_years, by=c("U54 Year" = "year")) |>
+                              dplyr::mutate(
+                                yr_annotation = sprintf("%s: %s - %s",`U54 Year`, start_date, end_date)
+                              ) |>
+                              dplyr::pull(yr_annotation) |>
+                              stringr::str_c(collapse="\n")
+                        ),
+                        ref_symbols = c("3")
     ) |>
 
     # Last thing should be apply the overall styling
