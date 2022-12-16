@@ -318,22 +318,22 @@ style_grants_as_flextable_epsilon<-function(d, ...) {
                             dplyr::pull(yr_annotation) |>
                             stringr::str_c(collapse="\n")
                         ),
-                        ref_symbols = c("1")
+                        ref_symbols = c("2")
     ) |>
     # Add Grant Status footnote.
     flextable::footnote(i = 1, j = 6, part = "header",
                         value = flextable::as_paragraph(
                           "Grant Status: F (Funded), NF (Not Funded), PR (Pending Review), IP (In Preparation)"
                         ),
-                        ref_symbols = c("2")
+                        ref_symbols = c("3")
     ) |>
 
     # Add ESI label
-  flextable::footnote(i = 1, j = 7, part = "header",
+  flextable::footnote(i = 1, j = 4, part = "header",
                       value = flextable::as_paragraph(
                         "Early Stage Investigator (ESI)"
                       ),
-                      ref_symbols = c("3")
+                      ref_symbols = c("1")
   ) |>
 
 
