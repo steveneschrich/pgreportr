@@ -304,10 +304,17 @@ style_grants_as_flextable_epsilon<-function(d, ...) {
     #flextable::merge_h(1, part="header") %>%
     #flextable::merge_v(j=1:5, part="header") %>%
     #flextable::align(j = ~`Funded`, align="center", part="header") %>%
+    # Add ESI label
+    flextable::footnote(i = 1, j = 4, part = "header",
+                        value = flextable::as_paragraph(
+                          "Early Stage Investigator (ESI)"
+                        ),
+                        ref_symbols = c("1")
+    ) |>
 
     flextable::footnote(i = 1, j = 2, part = "header",
                         value = flextable::as_paragraph(
-                          "U54 Year Submitted\n",
+                          "U54 Year\n",
                           dplyr::select(d, "U54 Year") |>
                             dplyr::filter(!stringr::str_detect(`U54 Year`, "\\(")) |>
                             dplyr::distinct() |>
@@ -328,13 +335,6 @@ style_grants_as_flextable_epsilon<-function(d, ...) {
                         ref_symbols = c("3")
     ) |>
 
-    # Add ESI label
-  flextable::footnote(i = 1, j = 4, part = "header",
-                      value = flextable::as_paragraph(
-                        "Early Stage Investigator (ESI)"
-                      ),
-                      ref_symbols = c("1")
-  ) |>
 
 
     # Last thing should be apply the overall styling
