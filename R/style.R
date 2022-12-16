@@ -305,13 +305,21 @@ style_grants_as_flextable_epsilon<-function(d, ...) {
     #flextable::merge_v(j=1:5, part="header") %>%
     #flextable::align(j = ~`Funded`, align="center", part="header") %>%
 
-    # Add ESI label
-  flextable::footnote(i = 1, j = 7, part = "header",
-                      value = flextable::as_paragraph(
-                        "Early Stage Investigator (ESI)"
-                      ),
-                      ref_symbols = c("1")
-  ) |>
+    flextable::footnote(i = 1, j = 2, part = "header",
+                        value = flextable::as_paragraph(
+                          "U54 Year Submitted (Funded)\n",
+                          dplyr::select(d, "U54 Year") |>
+                            dplyr::filter(!stringr::str_detect(`U54 Year`, "\\(")) |>
+                            dplyr::distinct() |>
+                            dplyr::left_join(pg_grant_years, by=c("U54 Year" = "year")) |>
+                            dplyr::mutate(
+                              yr_annotation = sprintf("%s: %s - %s",`U54 Year`, start_date, end_date)
+                            ) |>
+                            dplyr::pull(yr_annotation) |>
+                            stringr::str_c(collapse="\n")
+                        ),
+                        ref_symbols = c("1")
+    ) |>
     # Add Grant Status footnote.
     flextable::footnote(i = 1, j = 6, part = "header",
                         value = flextable::as_paragraph(
@@ -319,21 +327,15 @@ style_grants_as_flextable_epsilon<-function(d, ...) {
                         ),
                         ref_symbols = c("2")
     ) |>
-    flextable::footnote(i = 1, j = 2, part = "header",
-                        value = flextable::as_paragraph(
-                          "U54 Year Submitted (Funded)\n",
-                            dplyr::select(d, "U54 Year") |>
-                              dplyr::filter(!stringr::str_detect(`U54 Year`, "\\(")) |>
-                              dplyr::distinct() |>
-                              dplyr::left_join(pg_grant_years, by=c("U54 Year" = "year")) |>
-                              dplyr::mutate(
-                                yr_annotation = sprintf("%s: %s - %s",`U54 Year`, start_date, end_date)
-                              ) |>
-                              dplyr::pull(yr_annotation) |>
-                              stringr::str_c(collapse="\n")
-                        ),
-                        ref_symbols = c("3")
-    ) |>
+
+    # Add ESI label
+  flextable::footnote(i = 1, j = 7, part = "header",
+                      value = flextable::as_paragraph(
+                        "Early Stage Investigator (ESI)"
+                      ),
+                      ref_symbols = c("3")
+  ) |>
+
 
     # Last thing should be apply the overall styling
     apply_u54reportr_flextable_style()
