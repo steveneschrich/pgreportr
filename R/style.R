@@ -307,7 +307,7 @@ style_grants_as_flextable_epsilon<-function(d, ...) {
 
     flextable::footnote(i = 1, j = 2, part = "header",
                         value = flextable::as_paragraph(
-                          "U54 Year Submitted (Funded)\n",
+                          "U54 Year Submitted\n",
                           dplyr::select(d, "U54 Year") |>
                             dplyr::filter(!stringr::str_detect(`U54 Year`, "\\(")) |>
                             dplyr::distinct() |>
