@@ -231,6 +231,103 @@ style_grants_as_flextable_gamma<-function(d, ...) {
 }
 
 
+#' Title
+#'
+#' @details
+#' This function does no filtering to the table, but does the work of styling the
+#' table as a flextable. This can involve some heavy work, however, given the various
+#' ways in which styling requires post-processing.
+#'
+#' @param d
+#'
+#' @return
+#' @export
+#'
+#' @examples
+style_grants_as_flextable_epsilon<-function(d, ...) {
+  d |>
+    dplyr::mutate(
+      `Grant Number` = dplyr::row_number(),
+      `planned_date_of_submission`=lubridate::ymd(`planned_date_of_submission`),
+      `Submission Date` = dplyr::coalesce(`Submission Date`, `planned_date_of_submission`),
+      ESI = ifelse(is_esi_related, "ESI-related",""),
+      `Grant Year` = lubridate::year(`Submission Date`),
+      `Grant Status` =
+        dplyr::case_when(
+          `Grant Status` == "Funded" ~"F",
+          `Grant Status` == "In Preparation" ~ "IP",
+          `Grant Status` == "Not Funded" ~ "NF",
+          `Grant Status` == "Pending Review" ~ "PR"
+        )
+    ) |>
+    dplyr::select(
+      `Grant Number`,
+      `Grant Year`,
+      Source,
+      investigators,
+      Title,
+      `Grant Status`,
+      ESI
+    ) |>
+
+    # Add to flextable, this is likely to change.
+    flextable::flextable(
+      col_keys=c(
+        "Grant Number","Grant Year","Source","Investigators","Title","Grant Status",
+        "ESI", "investigators"
+      ),
+
+                         cwidth=c(0.3, 0.4, 1.0,1.75,2.5, 0.5, 0.75)) |>
+    # Manually set widths (using template).
+    #flextable::width(j=1:7,
+    #                 width=c(1.12, 0.81, 1.57, 0.94, 0.63, 1.75, 1.75)) %>%
+    # Collapse investigators (tibble) to single flextable cells.
+    flextable::compose(j = ~`Investigators`,
+                       value = format_investigators_by_institution(investigators,
+                                                                   group="Institution",
+                                                                   format_investigator_group=format_investigator_group_as_flextable,
+                                                                   combine_investigator_groups=combine_investigator_groups_as_flextable,
+                                                                   ...
+                       )
+    ) |>
+    # Remove the investigators field, we only need it for the formatting.
+    flextable::void(j = ~ investigators, part="all") |>
+    # Then specific formatting for this report
+    # Set alignments, style for columns
+    flextable::set_header_labels(`Investigators`="Investigators") |>
+    flextable::italic(j= ~`Title`, part="body") |>
+    flextable::bold(j= ~`Grant Type`, part="body") |>
+
+    # Add an extra header row for formatting
+    #flextable::add_header_row(top=TRUE,values=c(
+    #  "Date Submitted", "Grant Title", "Grant Agency", "Status",
+    #  "Funded","Investigators"),
+    #  colwidths=c(1,1,1,1,1,2,1)) %>%
+    #flextable::merge_h(1, part="header") %>%
+    #flextable::merge_v(j=1:5, part="header") %>%
+    #flextable::align(j = ~`Funded`, align="center", part="header") %>%
+
+    # Add ESI label
+  flextable::footnote(i = 1, j = 7, part = "header",
+                      value = flextable::as_paragraph(
+                        "Early Stage Investigator (ESI)"
+                      ),
+                      ref_symbols = c("1")
+  ) |>
+    # Add Grant Status footnote.
+    flextable::footnote(i = 1, j = 6, part = "header",
+                        value = flextable::as_paragraph(
+                          "Grant Status: F (Funded), NF (Not Funded), PR (Pending Review), IP (In Preparation)"
+                        ),
+                        ref_symbols = c("2")
+    ) |>
+
+    # Last thing should be apply the overall styling
+    apply_u54reportr_flextable_style()
+
+
+}
+
 
 #' Title
 #'

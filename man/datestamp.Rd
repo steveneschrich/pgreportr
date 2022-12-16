@@ -4,7 +4,7 @@
 \alias{datestamp}
 \title{Return today's date as YYMMDD for printing.}
 \usage{
-datestamp()
+datestamp(tzone = "")
 }
 \value{
 A string representing today's date.
