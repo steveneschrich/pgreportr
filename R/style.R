@@ -590,7 +590,8 @@ style_pubs_as_flextable_delta<-function(d, ...) {
       "Citation Number",
       "Publication Year",
       "Formatted Reference",
-      "U54 Core Support")
+      "U54 Support",
+      "ESI-Related")
   )
 
   # The reference is actually a composite of many different columns, composed into
@@ -608,7 +609,7 @@ style_pubs_as_flextable_delta<-function(d, ...) {
   # to apply formatting (alignment, padding, etc) to it.
   ft <- ft |>
     # Define column widths. This should agree with the number of columns in the table.
-    flextable::width(width = c(0.25, 0.25, 5,1.5)) |>
+    flextable::width(width = c(0.25, 0.25, 5,1.5,1.5)) |>
     # Center content
     flextable::align(j = c("Publication Year","Citation Number"), align="center") |>
     # Remove extra space in small columns
