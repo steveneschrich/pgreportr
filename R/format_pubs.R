@@ -117,7 +117,6 @@ format_author_as_chunks <- function(...) {
   tibble::tribble(
    ~txt, ~bold, ~underlined, ~vertical.align,
    author, TRUE, x$`Partnership Role`=="REC Trainee"|NA, NA_character_,
-   "*", TRUE, NA, "superscript",
    ifelse(x$`Partnership Role`=="ESI","[ESI]", NA), TRUE, NA, NA_character_
   )
 }

@@ -621,19 +621,14 @@ style_pubs_as_flextable_delta<-function(d, ...) {
     flextable::align(j="Formatted Reference", align = "justify") |>
 
     # Add footnotes for annotation.
-    flextable::add_footer_lines(values = c("L1","L2","L3")) |>
+    flextable::add_footer_lines(values = c("L1","L2")) |>
     flextable::compose(
-      i=1,j=1, part = "footer",
-      value = flextable::as_paragraph(
-        flextable::as_b(flextable::as_sup("*")),
-        flextable::as_b(" Partnership member"))) |>
-    flextable::compose(
-      i=2,j=1, part= "footer",
+      i=1,j=1, part= "footer",
       value = flextable::as_paragraph(
         flextable::as_b("REC Trainee") |> dplyr::mutate(underlined=TRUE))
     ) |>
     flextable::compose(
-      i=3, j=1, part="footer",
+      i=2, j=1, part="footer",
       value = flextable::as_paragraph(
         flextable::as_b("[ESI] Early Stage Investigator"))
     ) |>
