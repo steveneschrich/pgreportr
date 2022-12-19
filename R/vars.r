@@ -11,6 +11,8 @@ role_order<-c("Contact PI","PI","Co-PI","MPI","PD/PI","Site PI","Core Co-PI",
               "Mentor", "Sponsor")
 
 u54_cores <- c("QSC","PRBB","REC","Outreach Core","Admin Core","PEC")
-u54_othersupport <- c("Research Project","US-LACRN Supplement","ESI (non-Partnership related)")
+# Commented out ESI (non-Partnership related) on 20221219 for a request for resubmission.
+#u54_othersupport <- c("Research Project","US-LACRN Supplement","ESI (non-Partnership related)")
+u54_othersupport <- c("Research Project","US-LACRN Supplement")
 u54_support <- c(u54_cores, u54_othersupport)
 rtype_grants <- c("R00","R01", "R03", "R15", "R21", "R25", "R50","R34")
