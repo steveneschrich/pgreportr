@@ -587,8 +587,8 @@ style_pubs_as_flextable_delta<-function(d, ...) {
   ft <- flextable::flextable(
     tbl,
     col_keys=c(
-      "Publication Year",
       "Citation Number",
+      "Publication Year",
       "Formatted Reference",
       "Publication Date",
       "U54 Core Support")
@@ -621,14 +621,20 @@ style_pubs_as_flextable_delta<-function(d, ...) {
     flextable::align(j="Formatted Reference", align = "justify") |>
 
     # Add footnotes for annotation.
-    flextable::add_footer_lines(values = c("L1","L2")) |>
+    flextable::add_footer_lines(values = c("L1","L2","L3")) |>
     flextable::compose(
-      i=1,j=1, part= "footer",
+      i=1,j=1, part="footer",
+      value = flextable::as_paragraph(
+        flextable::as_b("Partnership Member")
+      )
+    ) |>
+    flextable::compose(
+      i=2,j=1, part= "footer",
       value = flextable::as_paragraph(
         flextable::as_b("REC Trainee") |> dplyr::mutate(underlined=TRUE))
     ) |>
     flextable::compose(
-      i=2, j=1, part="footer",
+      i=3, j=1, part="footer",
       value = flextable::as_paragraph(
         flextable::as_b("[ESI] Early Stage Investigator"))
     ) |>
