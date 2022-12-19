@@ -593,7 +593,7 @@ style_pubs_as_flextable_delta<-function(d, ...) {
       "Publication Year",
       "Formatted Reference",
       "U54 Support",
-      "ESI-Related")
+      "ESI Related")
   )
 
   # The reference is actually a composite of many different columns, composed into
