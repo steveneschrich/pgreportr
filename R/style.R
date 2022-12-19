@@ -581,7 +581,7 @@ style_pubs_as_flextable_delta<-function(d, ...) {
     # Add in a publication number (specific to this data).
     dplyr::mutate(
       `Citation Number`=dplyr::row_number(),
-      `ESI-Related` = ifelse(is_esi_related, "\U+F26E", NA)
+      `ESI-Related` = ifelse(is_esi_related, "\UF26E", NA)
     )
   # Create a flextable. Define the specific columns to use in the table here, even
   # if the columns do not exist in the source data (we can add formatting to a new
