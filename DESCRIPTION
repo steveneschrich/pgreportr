@@ -1,6 +1,6 @@
 Package: pgreportr
 Title: NIH Program Grant Reporting Library
-Version: 0.2.0
+Version: 0.2.1
 Authors@R: 
     person(given = "Steven",
            family = "Eschrich",
