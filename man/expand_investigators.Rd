@@ -14,7 +14,7 @@ The Investigator field is a nested tibble. This function expands the nested tibb
 creating multiple rows for the same grant with different investigators in each row.
 }
 \details{
-The \link[tidyr:nest]{tidyr::unnest} function provides the ability to nest a tibble within a tibble field.
+The \link[tidyr:unnest]{tidyr::unnest} function provides the ability to nest a tibble within a tibble field.
 We use this to embed the investigator tibble into the grants tibble, so that filtering and counting
 will proceed as normal. This is one way to accomplish a relational set of tables.
 

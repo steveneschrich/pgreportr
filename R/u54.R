@@ -3,11 +3,11 @@
 #' Routines customized for the PHSU-MCC U54 partnership.
 #'
 #' @rdname u54
-#'
+#' @name u54
 #'
 #'
 NULL
-#> NULL
+
 
 #' Filter table to PHSU Cancer-related projects
 #'

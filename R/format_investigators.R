@@ -80,7 +80,7 @@ format_investigator_group_as_flextable<-function(investigators, label="",
 
   # The label is either a tibble (with one entry, representing the label) or
   # just a plain string.
-  label<-ifelse(tibble::is_tibble(label),
+  label<-ifelse(is.data.frame(label),
                 label %>% dplyr::pull(1) %>% as.character(),
                 label)
 
@@ -144,7 +144,7 @@ format_investigator_group_as_text<-function(investigators, label="",
                                             summary_field="Investigator Summary", ...) {
   # The label is either a tibble (with one entry, representing the label) or
   # just a plain string.
-  label<-ifelse(tibble::is_tibble(label),
+  label<-ifelse(is.data.frame(label),
                 label %>% dplyr::pull(1) %>% as.character(),
                 label)
 

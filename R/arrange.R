@@ -11,7 +11,7 @@
 #' @export
 #'
 arrange_investigators_by_role<-function(investigators) {
-  assertthat::assert_that(tibble::is_tibble(investigators),
+  assertthat::assert_that(is.data.frame(investigators),
                           assertthat::has_name(investigators, "Role"),
                           exists("role_order"))
 
