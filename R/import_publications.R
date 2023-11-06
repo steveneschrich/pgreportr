@@ -65,11 +65,9 @@ import_publications <- function(uri, token) {
     .remove_authors_from_redcap_table() |>
 
     # Rename variables for easier use
-    dplyr::rename(pub_id=.data$record_id) |>
+    dplyr::rename(pub_id=record_id) |>
 
     # Creating a lubridate-supported date allows arithmetic
-    #dplyr::mutate(`Publication Date`=lubridate::ymd(.data$date_publication, truncated=1),
-    #              date_publication=NULL) |>
     dplyr::mutate(
       `Publication Date` = .convert_publication_date(date_publication),
       date_publication = NULL
@@ -111,7 +109,6 @@ import_publications <- function(uri, token) {
     # Create consolidated fields (comma-separated)
     tidyr::unite(col = "Tags", sep = ", ", remove = FALSE, na.rm = TRUE,
                  tidyr::starts_with("manuscript_tags___"))
-
 }
 
 
@@ -138,14 +135,34 @@ import_publications <- function(uri, token) {
     dplyr::rename(
       `Author` = .data$author_name,
       `Institution` = .data$author_institution,
-      `Partnership Role` = .data$author_partnership_role,
+      # NB: This is handled below now.
+      #`Partnership Role` = .data$author_partnership_role,
       pub_id = record_id,
       author_id = redcap_repeat_instance
     ) |>
     # Remove redcap indicator field
     dplyr::select(-authors_complete) |>
+    # NB: This is handled below now.
     # NA the None role, so it's not printed.
-    dplyr::mutate(`Partnership Role` = dplyr::na_if(`Partnership Role`, "None")) |>
+    #dplyr::mutate(`Partnership Role` = dplyr::na_if(`Partnership Role`, "None")) |>
+
+    # 2023-11-06. Partnership role has been vastly expanded to be checkboxes, including
+    # an "other" which needs to be converted.
+    .convert_checkbox_to_flags(
+      raw_prefix = "author_partnership_role",
+      indicator_prefix = "isPartnershipRole",
+      dictionary = pl$dictionary
+    ) |>
+    tidyr::unite(col = "Partnership Role",sep=", ", remove=FALSE, na.rm=TRUE,
+                 c(
+                   tidyr::starts_with("author_partnership_role___"),
+                   -dplyr::all_of("author_partnership_role___Other"),
+                   dplyr::all_of("partnership_role_other")
+                 )
+    ) |>
+    dplyr::mutate(
+      PartnershipRole = replace(`Partnership Role`, `Partnership Role` %in% c("","None","none"), NA)
+    ) |>
     # Create author summary text for printing
     dplyr::mutate(`Author Summary` = .derive_creator_summary(Author, `Partnership Role`))
 
@@ -173,6 +190,7 @@ import_publications <- function(uri, token) {
     dplyr::filter(.data$redcap_repeat_instrument == "Authors") |>
     # Keep author columns
     dplyr::select(tidyselect::starts_with("author"),
+                  partnership_role_other,
                   record_id,
                   redcap_repeat_instance
     )
@@ -199,6 +217,7 @@ import_publications <- function(uri, token) {
     dplyr::filter(is.na(.data$redcap_repeat_instrument)) |>
     # Remove author columns
     dplyr::select(-tidyselect::starts_with("author"),
-                  -redcap_repeat_instance
+                  -redcap_repeat_instance,
+                  -partnership_role_other
     )
 }
