@@ -1,6 +1,22 @@
-#' import.R
+#' import
 #'
-#' General-purposes routines for importing data from REDCap.
+#' @description General-purposes routines for importing data
+#' from REDCap.
+#'
+#' @details The `pgreportr` library manages two different object
+#' types: grants and publications. The overall process is to import
+#' this data directly from REDCap (using the [REDCapR::redcap_read()])
+#' function. And then perform a number of data manipulations on the
+#' imported data to make it suitable for later reporting.
+#'
+#' Therefore each individual import: [import_grants()]
+#' and [import_publications()] will call [read_redcap_data_online()]
+#' and then do followup processing. See the help items for
+#' [import_grants()] and [import_publications()] for specifics.
+#'
+#' Where possible, common functionality, code and terminology is used
+#' between objects. For instance, the concept of a program grant
+#' year, creators (whether grant investigators or publication authors).
 #'
 #' @name import
 #'
