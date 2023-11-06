@@ -2,7 +2,24 @@
 % Please edit documentation in R/import.R
 \name{import}
 \alias{import}
-\title{import.R}
+\title{import}
 \description{
-General-purposes routines for importing data from REDCap.
+General-purposes routines for importing data
+from REDCap.
+}
+\details{
+The \code{pgreportr} library manages two different object
+types: grants and publications. The overall process is to import
+this data directly from REDCap (using the \code{\link[REDCapR:redcap_read]{REDCapR::redcap_read()}})
+function. And then perform a number of data manipulations on the
+imported data to make it suitable for later reporting.
+
+Therefore each individual import: \code{\link[=import_grants]{import_grants()}}
+and \code{\link[=import_publications]{import_publications()}} will call \code{\link[=read_redcap_data_online]{read_redcap_data_online()}}
+and then do followup processing. See the help items for
+\code{\link[=import_grants]{import_grants()}} and \code{\link[=import_publications]{import_publications()}} for specifics.
+
+Where possible, common functionality, code and terminology is used
+between objects. For instance, the concept of a program grant
+year, creators (whether grant investigators or publication authors).
 }

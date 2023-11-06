@@ -33,7 +33,26 @@ import_publications <- function(uri, token) {
 
 
 
-
+#' Convert publication dates to date format
+#'
+#' @details Conversion of hand-entered publication dates can be very tricky,
+#' as there are many different formats possible. This functionality was
+#' extracted to its own function so that this can be tweaked as necessary.
+#'
+#' @param s A vector of strings representing dates (hopefully)
+#'
+#' @return A vector of dates
+#' @export
+#'
+#' @examples
+.convert_publication_date <- function(s) {
+  lubridate::parse_date_time(
+    s,
+    truncated=1,
+    orders=c("ymd","m/d/y","y")
+  ) |>
+    as.Date.POSIXct()
+}
 #' Title
 #'
 #' @param pl
@@ -49,9 +68,12 @@ import_publications <- function(uri, token) {
     dplyr::rename(pub_id=.data$record_id) |>
 
     # Creating a lubridate-supported date allows arithmetic
-    dplyr::mutate(`Publication Date`=lubridate::ymd(.data$date_publication, truncated=1),
-                  date_publication=NULL) |>
-
+    #dplyr::mutate(`Publication Date`=lubridate::ymd(.data$date_publication, truncated=1),
+    #              date_publication=NULL) |>
+    dplyr::mutate(
+      `Publication Date` = .convert_publication_date(date_publication),
+      date_publication = NULL
+    ) |>
     # Based on the publication date, extract just the year of publication
     dplyr::mutate(`Publication Year`=as.character(lubridate::year(`Publication Date`))) |>
 
