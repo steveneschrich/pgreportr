@@ -161,7 +161,7 @@ import_publications <- function(uri, token) {
                  )
     ) |>
     dplyr::mutate(
-      PartnershipRole = replace(`Partnership Role`, `Partnership Role` %in% c("","None","none"), NA)
+      `Partnership Role` = replace(`Partnership Role`, `Partnership Role` %in% c("","None","none"), NA)
     ) |>
     # Create author summary text for printing
     dplyr::mutate(`Author Summary` = .derive_creator_summary(Author, `Partnership Role`))
