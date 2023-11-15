@@ -28,7 +28,7 @@ import_grants<-function(uri, token) {
 
 
   # Add indicators for various conditions, some of which require both tables.
-  grant_table <- grant_table %>%
+  grant_table <- grant_table |>
     dplyr::mutate(
       is_grant_joint = .is_grant_joint(investigators),
       is_grant_funded = (`Grant Status`=="Funded"),
@@ -202,17 +202,36 @@ import_grants<-function(uri, token) {
     )) |>
 
     dplyr::mutate(`Role` = dplyr::coalesce(
-      .data$role_other, .data$investigator_role
+     .data$role_other, .data$investigator_role
     )) |>
 
     dplyr::mutate(`Institution` = dplyr::coalesce(
       .data$institution_other, .data$investigator_institution
     )) |>
 
-    dplyr::mutate(`Partnership Role` = dplyr::coalesce(
-      .data$partnership_role_other, .data$investigator_partnership_role
-    )) |>
-
+    # This is now an expanded field
+    # dplyr::mutate(`Partnership Role` = dplyr::coalesce(
+    #   .data$partnership_role_other, .data$investigator_partnership_role
+    # )) |>
+    # 2023-11-06. Partnership role has been vastly expanded to be checkboxes, including
+    # an "other" which needs to be converted.
+    .convert_checkbox_to_flags(
+      raw_prefix = "investigator_partnership_role",
+      indicator_prefix = "isPartnershipRole",
+      dictionary = gl$dictionary
+    ) |>
+    tidyr::unite(col = "Partnership Role",sep=", ", remove=FALSE, na.rm=TRUE,
+                 c(
+                   tidyr::starts_with("investigator_partnership_role___"),
+                   -dplyr::all_of("investigator_partnership_role___Other"),
+                   dplyr::all_of("partnership_role_other")
+                 )
+    ) |>
+    dplyr::mutate(
+      `Partnership Role` = replace(`Partnership Role`, `Partnership Role` %in% c("","None","none"), NA)
+    ) |>
+    # Create author summary text for printing
+  #  dplyr::mutate(`Author Summary` = .derive_creator_summary(Author, `Partnership Role`))
     # Clean up remaining variables.
     dplyr::rename(
       grant_id=record_id,
@@ -226,7 +245,7 @@ import_grants<-function(uri, token) {
 
     dplyr::mutate(`Investigator Summary` = .derive_creator_summary(
       Investigator, `Partnership Role`, `Role`
-    )) %>%
+    )) |>
 
     # Select the order for the table
     dplyr::select(.data$grant_id,
@@ -250,9 +269,9 @@ import_grants<-function(uri, token) {
 #' @examples
 .remove_investigators <- function(.x) {
 
-  .x %>%
+  .x |>
     # Remove investigator rows (repeated instruments)
-    dplyr::filter(is.na(.data$redcap_repeat_instrument)) %>%
+    dplyr::filter(is.na(.data$redcap_repeat_instrument)) |>
 
     # Remove investigator-level columns
     dplyr::select(-tidyselect::starts_with("investigator_"),
@@ -277,9 +296,9 @@ import_grants<-function(uri, token) {
 #' @examples
 .remove_grants <- function(.x) {
 
-  .x %>%
+  .x |>
     # Remove investigator rows (repeated instruments)
-    dplyr::filter(.data$redcap_repeat_instrument=="Investigators") %>%
+    dplyr::filter(.data$redcap_repeat_instrument=="Investigators") |>
 
     # Remove investigator-level columns
     dplyr::select(tidyselect::starts_with("investigator_"),
