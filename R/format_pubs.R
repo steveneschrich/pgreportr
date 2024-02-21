@@ -42,7 +42,7 @@ format_publication_as_paragraph <- function(...) {
       list(txt=". "),
       list(txt=x$journal, italic=TRUE),
       list(txt=": "),
-      list(txt=format.Date(x$`Publication Date`, "%Y %b;")),
+      list(txt=format.Date(x$publication_date, "%Y %b;")),
       list(txt=as.character(x$pub_citation_vol)),
       list(txt=if (is.na(x$pub_citation_issue)) "" else sprintf("(%s)",x$pub_citation_issue)),
       list(txt=if (is.na(x$pub_citation_pg)) "" else paste0(":",x$pub_citation_pg)),
@@ -107,17 +107,19 @@ format_author_as_chunks <- function(...) {
   x <- rlang::list2(...)
 
   # Start with the author name (standard format).
-  author <- format_name(x$Author)
+  # NOTE: The degree is not included in publications (from pubmed),
+  # so these are excluded from the formatting.
+  author <- pgimportr::format_name(x$author_name, use_degree = FALSE)
 
   # If author is not a partnership member, we just use the formatted name.
-  if ( is.na(x$`Partnership Role`))
+  if ( is.na(x$partnership_role))
     return(list(txt=author))
 
   # Otherwise, we need to add formatting based on role
   tibble::tribble(
    ~txt, ~bold, ~underlined, ~vertical.align,
-   author, TRUE, x$`Partnership Role`=="REC Trainee"|NA, NA_character_,
-   ifelse(x$`Partnership Role`=="ESI","[ESI]", NA), TRUE, NA, NA_character_
+   author, TRUE, x$partnership_role=="REC Trainee"|NA, NA_character_,
+   ifelse(x$partnership_role=="ESI","[ESI]", NA), TRUE, NA, NA_character_
   )
 }
 
@@ -139,7 +141,7 @@ format_author_as_chunks <- function(...) {
 #' @examples
 format_authors_as_text<-function(.x,  collapse=", ") {
 
-  stringr::str_c(.x$`Author Summary`, collapse = collapse)
+  stringr::str_c(.x$author_summary, collapse = collapse)
 }
 
 

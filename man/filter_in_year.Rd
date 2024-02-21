@@ -7,7 +7,7 @@
 \alias{filter_pubs_in_year}
 \title{Filter records in Partnership Grant year yr.}
 \usage{
-filter_in_year(.x, var, yr = print_pg_years())
+filter_in_year(.x, var, yr = pg_project_years())
 
 filter_grants_submitted_in_year(.x, ...)
 

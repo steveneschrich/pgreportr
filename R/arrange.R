@@ -11,10 +11,8 @@
 #' @export
 #'
 arrange_investigators_by_role<-function(investigators) {
-  assertthat::assert_that(is.data.frame(investigators),
-                          assertthat::has_name(investigators, "Role"),
-                          exists("role_order"))
 
-  dplyr::arrange(investigators, match(.data$Role, role_order))
+
+  dplyr::arrange(investigators, match(investigator_role, role_order))
 
 }

@@ -14,8 +14,17 @@
 #'
 #' @examples
 format_grants_text<-function(grants) {
-  text_table<-collapse_investigators(grants) %>%
-    dplyr::select(Investigators, everything())
-
-  text_table
+  dplyr::mutate(
+    grants,
+    Investigators = purrr::map(investigators, \(.i) {
+      format_investigators_text(.i) |>
+        paste(collapse=";")
+    })
+  )
 }
+
+#  text_table<-collapse_investigators(grants) %>%
+#    dplyr::select(investigators, everything())
+#
+##  text_table
+#}

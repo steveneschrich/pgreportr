@@ -161,18 +161,24 @@ style_grants_as_flextable_beta<-function(d, ...) {
 #'
 #' @examples
 style_grants_as_flextable_gamma<-function(d, ...) {
-  d %>%
-    dplyr::mutate(`planned_date_of_submission`=lubridate::ymd(`planned_date_of_submission`)) %>%
+  d |>
+    dplyr::mutate(`planned_date_of_submission`=lubridate::ymd(`planned_date_of_submission`)) |>
     dplyr::mutate(`Submission Date` =
-                   dplyr::coalesce(`Submission Date`, `planned_date_of_submission`) ) %>%
-    dplyr::select(`Grant Type`, `Source`, `Submission Date`,  `investigators`, `Title`, `Grant Status`,`U54 Core Support`) %>%
+                   dplyr::coalesce(submission_date, `planned_date_of_submission`),
+                  `Grant Type` = grant_type,
+                  Source = grant_source,
+                  Title = grant_title,
+                  `Grant Status` = grant_status,
+                  `U54 Core Support` = core_support
+                  ) |>
+    dplyr::select(`Grant Type`, `Source`, `Submission Date`,  `investigators`, `Title`, `Grant Status`,`U54 Core Support`) |>
     dplyr::mutate(`Grant Status` =
                     dplyr::case_when(
                       `Grant Status` == "Funded" ~"F",
                       `Grant Status` == "In Preparation" ~ "IP",
                       `Grant Status` == "Not Funded" ~ "NF",
                       `Grant Status` == "Pending Review" ~ "PR"
-                    )) %>%
+                    )) |>
 
     # Add to flextable, this is likely to change.
     flextable::flextable(col_keys=c("Grant Type","Source","Submission Date","Investigators","Title","Grant Status",
@@ -186,19 +192,19 @@ style_grants_as_flextable_gamma<-function(d, ...) {
     # Collapse investigators (tibble) to single flextable cells.
     flextable::compose(j = ~`Investigators`,
                        value = format_investigators_by_institution(investigators,
-                                                                   group="Institution",
+                                                                   group="investigator_institution",
                                                                    format_investigator_group=format_investigator_group_as_flextable,
                                                                    combine_investigator_groups=combine_investigator_groups_as_flextable,
                                                                    ...
                        )
-    ) %>%
+    ) |>
     # Remove the investigators field, we only need it for the formatting.
-    flextable::void(j = ~ investigators, part="all") %>%
+    flextable::void(j = ~ investigators, part="all") |>
     # Then specific formatting for this report
     # Set alignments, style for columns
-    flextable::set_header_labels(`Investigators`="Investigators") %>%
-    flextable::italic(j= ~`Title`, part="body") %>%
-    flextable::bold(j= ~`Grant Type`, part="body") %>%
+    flextable::set_header_labels(`Investigators`="Investigators") |>
+    flextable::italic(j= ~`Title`, part="body") |>
+    flextable::bold(j= ~`Grant Type`, part="body") |>
 
     # Add an extra header row for formatting
     #flextable::add_header_row(top=TRUE,values=c(
@@ -215,14 +221,14 @@ style_grants_as_flextable_gamma<-function(d, ...) {
         "Early Stage Investigator (ESI)"
       ),
       ref_symbols = c("1")
-    ) %>%
+    ) |>
     # Add Grant Status footnote.
     flextable::footnote(i = 1, j = 6, part = "header",
       value = flextable::as_paragraph(
         "Grant Status: F (Funded), NF (Not Funded), PR (Pending Review), IP (In Preparation)"
       ),
       ref_symbols = c("2")
-    ) %>%
+    ) |>
 
     # Last thing should be apply the overall styling
   apply_u54reportr_flextable_style()
@@ -245,19 +251,24 @@ style_grants_as_flextable_gamma<-function(d, ...) {
 #'
 #' @examples
 style_grants_as_flextable_epsilon<-function(d, ...) {
+
+  pgyrs <- pg_project_years()
   d |>
     dplyr::mutate(
       `Grant Number` = dplyr::row_number(),
       `planned_date_of_submission`=lubridate::ymd(`planned_date_of_submission`),
-      `Submission Date` = dplyr::coalesce(`Submission Date`, `planned_date_of_submission`),
+      `Submission Date` = dplyr::coalesce(submission_date, planned_date_of_submission),
       ESI = ifelse(is_esi_related, "ESI-related",""),
       `Grant Status` =
         dplyr::case_when(
-          `Grant Status` == "Funded" ~"F",
-          `Grant Status` == "In Preparation" ~ "IP",
-          `Grant Status` == "Not Funded" ~ "NF",
-          `Grant Status` == "Pending Review" ~ "PR"
-        )
+          `grant_status` == "Funded" ~"F",
+          `grant_status` == "In Preparation" ~ "IP",
+          `grant_status` == "Not Funded" ~ "NF",
+          `grant_status` == "Pending Review" ~ "PR"
+        ),
+      `U54 Year` = pg_year,
+      Source = grant_source,
+      Title = grant_title
     ) |>
     dplyr::select(
       `Grant Number`,
@@ -283,7 +294,7 @@ style_grants_as_flextable_epsilon<-function(d, ...) {
     # Collapse investigators (tibble) to single flextable cells.
     flextable::compose(j = ~`Investigators`,
                        value = format_investigators_by_institution(investigators,
-                                                                   group="Institution",
+                                                                   group="investigator_institution",
                                                                    format_investigator_group=format_investigator_group_as_flextable,
                                                                    combine_investigator_groups=combine_investigator_groups_as_flextable,
                                                                    ...
@@ -312,21 +323,23 @@ style_grants_as_flextable_epsilon<-function(d, ...) {
                         ref_symbols = c("1")
     ) |>
 
-    flextable::footnote(i = 1, j = 2, part = "header",
-                        value = flextable::as_paragraph(
-                          "U54 Year\n",
-                          dplyr::select(d, "U54 Year") |>
-                            dplyr::filter(!stringr::str_detect(`U54 Year`, "\\(")) |>
-                            dplyr::distinct() |>
-                            dplyr::left_join(pg_grant_years, by=c("U54 Year" = "year")) |>
-                            dplyr::mutate(
-                              yr_annotation = sprintf("%s: %s - %s",`U54 Year`, start_date, end_date)
-                            ) |>
-                            dplyr::pull(yr_annotation) |>
-                            stringr::str_c(collapse="\n")
-                        ),
-                        ref_symbols = c("2")
-    ) |>
+
+
+    # flextable::footnote(i = 1, j = 2, part = "header",
+    #                     value = flextable::as_paragraph(
+    #                       "U54 Year\n",
+    #                       dplyr::select(d, "U54 Year") |>
+    #                         dplyr::filter(!stringr::str_detect(`U54 Year`, "\\(")) |>
+    #                         dplyr::distinct() |>
+    #                         dplyr::left_join(pgyrs, by=c("U54 Year" = "name")) |>
+    #                         dplyr::mutate(
+    #                           yr_annotation = sprintf("%s: %s - %s",`U54 Year`, start_date, end_date)
+    #                         ) |>
+    #                         dplyr::pull(yr_annotation) |>
+    #                         stringr::str_c(collapse="\n")
+    #                     ),
+    #                     ref_symbols = c("2")
+    # ) |>
     # Add Grant Status footnote.
     flextable::footnote(i = 1, j = 6, part = "header",
                         value = flextable::as_paragraph(
@@ -479,7 +492,7 @@ style_grants_as_text_alpha<-function(grants, ...) {
   text_table <- grants %>%
     dplyr::rowwise() %>%
     dplyr::mutate(`Investigators` = format_investigators_by_institution(list(investigators),
-                                                                    group="Institution",
+                                                                    group="investigator_institution",
                                                                     format_investigator_group=format_investigator_group_as_text,
                                                                     combine_investigator_groups =combine_investigator_groups_as_text,
                                                                     ...
@@ -581,7 +594,9 @@ style_pubs_as_flextable_delta<-function(d, ...) {
     # Add in a publication number (specific to this data).
     dplyr::mutate(
       `Citation Number`=dplyr::row_number(),
-      `ESI Related` = ifelse(is_esi_related, "Yes", "")
+      `ESI Related` = ifelse(is_esi_related, "Yes", ""),
+      `Publication Year` = publication_year,
+      `U54 Support` = support
     )
   # Create a flextable. Define the specific columns to use in the table here, even
   # if the columns do not exist in the source data (we can add formatting to a new
