@@ -594,7 +594,7 @@ style_pubs_as_flextable_delta<-function(d, ...) {
     # Add in a publication number (specific to this data).
     dplyr::mutate(
       `Citation Number`=dplyr::row_number(),
-      `ESI Related` = ifelse(is_esi_related, "Yes", ""),
+      `ESI Related` = ifelse(is_esi_related, "ESI", ""),
       `Publication Year` = publication_year,
       `U54 Support` = support
     )
