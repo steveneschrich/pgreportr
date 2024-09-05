@@ -91,7 +91,17 @@ format_investigator_group_as_flextable<-function(investigators, label="",
       list(dplyr::bind_rows(
         flextable::as_chunk(format_investigator_name(.data$investigator_name, ...), ),
         flextable::as_chunk(ifelse(is.na(.data$investigator_role), "", paste0(" (",.data$investigator_role,")"))),
-        flextable::as_sup(ifelse(isPartnershipRole_ESI,"1","")),
+        # Add in a superscript indicating various conditions (currently ESI, former ESI)
+        # NB: This may eventually need to handle cases of multiple subscripts per person.
+        flextable::as_sup(
+          flextable::as_b(
+          dplyr::case_when(
+            `isPartnershipRole_Former ESI` ~ "*",
+            isPartnershipRole_ESI ~ "\u2020",
+            .default = ""
+          )
+          )
+        ),
         flextable::as_chunk(sep)
       ))
     ) %>%
@@ -153,7 +163,12 @@ format_investigator_group_as_text<-function(investigators, label="",
     dplyr::mutate(
       formatted_investigator_name = sprintf("%s%s%s", format_investigator_name(investigator_name,...),
                                                         str_enclose(investigator_role),
-                                                        ifelse(isPartnershipRole_ESI," [ESI]", "")
+                                                        dplyr::case_when(
+                                                            `isPartnershipRole_Former ESI` ~ " [Former ESI]",
+                                                            isPartnershipRole_ESI ~ " [ESI]",
+                                                            .default = ""
+                                            )
+
     ))
 
   # Final output is label, investigators. Only do label

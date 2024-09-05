@@ -119,7 +119,12 @@ format_author_as_chunks <- function(...) {
   tibble::tribble(
    ~txt, ~bold, ~underlined, ~vertical.align,
    author, TRUE, x$partnership_role=="REC Trainee"|NA, NA_character_,
-   ifelse(x$partnership_role=="ESI","[ESI]", NA), TRUE, NA, NA_character_
+   dplyr::case_when(
+     `isPartnershipRole_Former ESI` ~ "[Former ESI]",
+     isPartnershipRole_ESI ~ "[ESI]",
+     .default = NA
+   ),
+   TRUE, NA, NA_character_
   )
 }
 

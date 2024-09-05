@@ -2,6 +2,8 @@
 % Please edit documentation in R/pgreportr-package.R
 \docType{package}
 \name{u54reportr}
+\alias{pgreportr}
+\alias{pgreportr-package}
 \alias{u54reportr}
 \title{PGRT - Program Grant Reporting Tool. NIH Program Grants (e.g., U54, SPORE, etc) often involve
 the tracking and reporting of scientific outcomes from the research. This involves outcomes such
@@ -27,4 +29,8 @@ Most of the current functionality is in grant submissions and funded grants.
 Key to this package is the grants table. It is a tibble (tidyverse) that contains grants, one
 line per grant. There are a number of different columns useful for sorting/filtering, and each
 one has an embedded tibble representing investigators.
+}
+\author{
+\strong{Maintainer}: Steven Eschrich \email{Steven.Eschrich@moffitt.org} (\href{https://orcid.org/YOUR-ORCID-ID}{ORCID})
+
 }

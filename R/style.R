@@ -169,9 +169,14 @@ style_grants_as_flextable_gamma<-function(d, ...) {
                   Source = grant_source,
                   Title = grant_title,
                   `Grant Status` = grant_status,
-                  `U54 Core Support` = core_support
+                  `U54 Core Support` = core_support,
+                  `ESI Related` = dplyr::case_when(
+                    is_current_esi_related ~ "ESI",
+                    is_former_esi_related ~ "Former ESI",
+                    .default = ""
+                  )
                   ) |>
-    dplyr::select(`Grant Type`, `Source`, `Submission Date`,  `investigators`, `Title`, `Grant Status`,`U54 Core Support`) |>
+    dplyr::select(`Grant Type`, `Source`, `Submission Date`,  `investigators`, `Title`, `Grant Status`,`U54 Core Support`,`ESI Related`) |>
     dplyr::mutate(`Grant Status` =
                     dplyr::case_when(
                       `Grant Status` == "Funded" ~"F",
@@ -182,10 +187,10 @@ style_grants_as_flextable_gamma<-function(d, ...) {
 
     # Add to flextable, this is likely to change.
     flextable::flextable(col_keys=c("Grant Type","Source","Submission Date","Investigators","Title","Grant Status",
-                                    "U54 Core Support",
+                                    "U54 Core Support", "ESI Related",
                                     "investigators"),
 
-                         cwidth=c(0.2, 0.5, 0.5,1.75,2.5, 0.5, 0.5,1)) %>%
+                         cwidth=c(0.2, 0.5, 0.5,1.75,2.5, 0.4, 0.4,0.3,1)) %>%
     # Manually set widths (using template).
     #flextable::width(j=1:7,
     #                 width=c(1.12, 0.81, 1.57, 0.94, 0.63, 1.75, 1.75)) %>%
@@ -218,7 +223,7 @@ style_grants_as_flextable_gamma<-function(d, ...) {
     # Add ESI label
     flextable::footnote(i = 1, j = 4, part = "header",
       value = flextable::as_paragraph(
-        "Early Stage Investigator (ESI)"
+        "Role: \u2020 (Current ESI), * (Former ESI)"
       ),
       ref_symbols = c("1")
     ) |>
@@ -594,7 +599,11 @@ style_pubs_as_flextable_delta<-function(d, ...) {
     # Add in a publication number (specific to this data).
     dplyr::mutate(
       `Citation Number`=dplyr::row_number(),
-      `ESI Related` = ifelse(is_esi_related, "ESI", ""),
+      `ESI Related` = dplyr::case_when(
+        is_current_esi_related ~ "ESI",
+        is_former_esi_related ~ "Former ESI",
+        .default = ""
+      ),
       `Publication Year` = publication_year,
       `U54 Support` = support
     )
@@ -638,7 +647,7 @@ style_pubs_as_flextable_delta<-function(d, ...) {
     flextable::align(j="Formatted Reference", align = "justify") |>
 
     # Add footnotes for annotation.
-    flextable::add_footer_lines(values = c("L1","L2","L3")) |>
+    flextable::add_footer_lines(values = c("L1","L2","L3","L4")) |>
     flextable::compose(
       i=1,j=1, part="footer",
       value = flextable::as_paragraph(
@@ -653,10 +662,14 @@ style_pubs_as_flextable_delta<-function(d, ...) {
     flextable::compose(
       i=3, j=1, part="footer",
       value = flextable::as_paragraph(
-        flextable::as_b("[ESI] Early Stage Investigator"))
+        flextable::as_b("[ESI] Current Early Stage Investigator"))
     ) |>
 
-
+    flextable::compose(
+      i=4, j=1, part="footer",
+      value = flextable::as_paragraph(
+        flextable::as_b("[Former ESI] Former Early Stage Investigator"))
+    ) |>
     # Last thing should be apply the overall styling
     apply_u54reportr_flextable_style()
 
