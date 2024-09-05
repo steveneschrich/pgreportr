@@ -78,5 +78,24 @@ paste_noNA<-function(v1, v2, sep=", ") {
 datestamp<-lubridate::today
 
 
+#' Title
+#'
+#' @param s
+#' @param open
+#' @param close
+#' @param add_space
+#'
+#' @return
+#' @export
+#'
+#' @examples
+str_enclose <- function(s, open="(",close=")", add_space = TRUE) {
+  # Note: This needs to be something that keeps the NA, which paste does not do.
+  s <- stringr::str_c(ifelse(add_space," ",""), open, s, close)
+  s <- tidyr::replace_na(s,"")
+
+  s
+}
+
 
 

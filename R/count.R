@@ -13,10 +13,8 @@
 #' @export
 #'
 count_submissions_by_year<-function(d) {
-  d %>%
-    dplyr::group_by(`U54 Fiscal Year Submitted`) %>%
-    dplyr::summarize(n=dplyr::n(), .groups="drop_last") %>%
-    dplyr::pull("n", name="U54 Fiscal Year Submitted")
+    dplyr::count(d, pg_year_submitted) |>
+      dplyr::pull("n", name="pg_year_submitted")
 }
 
 #' Count number of grant submissions
@@ -28,16 +26,14 @@ count_submissions_by_year<-function(d) {
 #'
 #' @examples
 count_submissions<-function(d) {
-  d %>%
-    dplyr::summarize(n=dplyr::n()) %>%
+  d |>
+    dplyr::summarize(n=dplyr::n()) |>
     dplyr::pull("n")
 }
 
 count_funded<-function(d) {
-  d %>%
-    dplyr::group_by(`U54 Fiscal Year Funded`) %>%
-    dplyr::summarize(n=n(), .group="drop_last") %>%
-    pull("n", name="U54 Fiscal Year Funded")
+  dplyr::count(d, pg_year_funded) |>
+    pull("n", name="pg_year_funded")
 }
 
 
@@ -54,11 +50,10 @@ count_funded<-function(d) {
 #' @export
 #'
 count_grants_funded_by_year<-function(d) {
-  d %>%
-    filter_grants_funded() %>%  # Only funded grants
-    dplyr::group_by(`U54 Fiscal Year Funded`) %>% # Grouped by funded fiscal year
-    dplyr::summarize(n=dplyr::n(), .groups="keep") %>% # Add count of each year
-    dplyr::pull("n", name="U54 Fiscal Year Funded") # Extract named list of counts
+
+    filter_grants_funded(d) |>  # Only funded grants
+    dplyr::count(pg_year_funded) |> # Grouped by funded fiscal year
+    dplyr::pull("n", name="pg_year_funded") # Extract named list of counts
 }
 
 
@@ -70,9 +65,9 @@ count_grants_funded_by_year<-function(d) {
 #' @export
 #'
 count_grants_funded<-function(d) {
-  d %>%
-    filter_grants_funded() %>%
-    dplyr::summarize(n=dplyr::n()) %>%
+
+    filter_grants_funded(d) |>
+    dplyr::summarize(n=dplyr::n()) |>
     dplyr::pull("n")
 }
 #' Add a TOTAL to a list of counts.
@@ -102,17 +97,18 @@ add_list_total<-function(l) {
 #'
 #' @examples
 count_esi_mentions_in_grant<-function(g) {
-  g %>%
-    expand_investigators(cols=investigators) %>%
-    dplyr::filter(is_esi_investigator(`Partnership Role`)) %>%
-    nrow()
+  purrr::map_int(g$investigators, \(.x) {
+    length(which(.x[["isPartnershipRole_ESI"]]))
+  })
+
 }
 
 count_esi_mentions_in_pubs <- function(.x) {
-  .x %>%
-    expand_investigators() %>%
-    dplyr::filter(is_esi_investigator(`Partnership Role`)) %>%
-    nrow()
+  warn("This may not work correctly")
+  purrr::map_int(.x$investigators, \(.y) {
+    length(which(.y[["isPartnershipRole_ESI"]]))
+  })
+
 }
 
 #' Title
@@ -148,6 +144,6 @@ count_esi_mentions <- function(.x, var) {
 #'
 #' @examples
 count_esi_creators <- function(.x) {
-  purrr::map_int(.x, ~dplyr::filter(.x, is_creator_esi(`Partnership Role`)) %>% nrow())
+  purrr::map_int(.x, ~dplyr::filter(.x, is_creator_esi(partnership_role)) %>% nrow())
 }
 

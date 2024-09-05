@@ -46,23 +46,23 @@ filter_between <- function(.x, var, start, end = format(Sys.time(), '%Y%m%d')) {
 #' @describeIn filter_between Filter grants submitted between dates
 #' @export
 filter_grants_submitted_between<-function(.x, ...) {
-  .x %>%
-    filter_grants_submitted() %>%
-    filter_between(var = `Submission Date`, ...)
+  .x |>
+    filter_grants_submitted() |>
+    filter_between(var = submission_date, ...)
 }
 
 #' @describeIn filter_between Filter grants funded between dates
 #' @export
 filter_grants_funded_between <- function(.x, ...) {
-  .x %>%
-    filter_grants_funded() %>%
-    filter_between(var = `Funding Start Date`, ...)
+  .x |>
+    filter_grants_funded() |>
+    filter_between(var = funding_start_date, ...)
 }
 
 #' @describeIn filter_between Filter publications published between dates
 #' @export
 filter_pubs_between <- function(.x, ...) {
-  filter_between(.x, var = `Publication Date`, ...)
+  filter_between(.x, var = publication_date, ...)
 }
 
 
@@ -89,7 +89,7 @@ filter_pubs_between <- function(.x, ...) {
 #'
 #' @importFrom rlang .data
 #' @examples
-filter_in_year <- function(.x, var, yr = print_pg_years() ) {
+filter_in_year <- function(.x, var, yr = pg_project_years() ) {
   dplyr::filter(.x, {{ var }} %in% yr)
 }
 
@@ -97,24 +97,24 @@ filter_in_year <- function(.x, var, yr = print_pg_years() ) {
 #' @describeIn filter_in_year Filter grants submitted in year
 #' @export
 filter_grants_submitted_in_year <- function(.x, ...) {
-  .x %>%
-    filter_grants_submitted() %>%
-    filter_in_year(var = `U54 Fiscal Year Submitted`, ...)
+  .x |>
+    filter_grants_submitted() |>
+    filter_in_year(var = pg_year_submitted, ...)
 }
 
 #' @describeIn filter_in_year Filter grants with funding starting in PG year yr.
 #' @export
 filter_grants_funded_in_year<-function(.x, ...) {
-  .x %>%
-    filter_grants_funded() %>%
-    filter_in_year(var = `U54 Fiscal Year Funded`, ...)
+  .x |>
+    filter_grants_funded() |>
+    filter_in_year(var = pg_year_funded, ...)
 
 }
 
 #' @describeIn filter_in_year Filter publications in Partnership Grant year yr
 #' @export
 filter_pubs_in_year <- function(.x, ...) {
-  filter_in_year(var = `U54 Year Published`, ...)
+  filter_in_year(var = pg_year_published, ...)
 }
 
 
@@ -353,9 +353,9 @@ filter_by_support <- function(.x, support) {
 #' @export
 #'
 #' @examples
-filter_u54_fiscal_years_funded<-function(d, grant_years) {
-  dplyr::filter(d, .data$`U54 Fiscal Year Funded` %in% grant_years) %>%
-    dplyr::mutate(`U54 Fiscal Year Funded` = factor(`U54 Fiscal Year Funded`))
+filter_pg_years_funded<-function(d, grant_years) {
+  dplyr::filter(d, pg_year_funded %in% grant_years) %>%
+    dplyr::mutate(pg_year_funded = factor(pg_year_funded))
 
 }
 
@@ -374,8 +374,8 @@ filter_u54_fiscal_years_funded<-function(d, grant_years) {
 #'
 #' @examples
 filter_u54_fiscal_years_submitted<-function(d, grant_years) {
-  dplyr::filter(d, .data$`U54 Fiscal Year Submitted` %in% grant_years) %>%
-    dplyr::mutate(`U54 Fiscal Year Submitted` = factor(`U54 Fiscal Year Submitted`))
+  dplyr::filter(d, pg_year_submitted %in% grant_years) %>%
+    dplyr::mutate(pg_year_submitted = factor(pg_year_submitted))
 }
 
 

@@ -22,9 +22,9 @@ NULL
 #'
 #' @examples
 get_field_choices <- function(dictionary, field) {
-  dictionary %>%
-    dplyr::filter( field_name == field ) %>%
-    dplyr::pull("Levels") %>%
+  dictionary |>
+    dplyr::filter( field_name == field ) |>
+    dplyr::pull("Levels") |>
     unlist()
 }
 #' Map a checkbox variable into levels

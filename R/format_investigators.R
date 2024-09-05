@@ -80,21 +80,30 @@ format_investigator_group_as_flextable<-function(investigators, label="",
 
   # The label is either a tibble (with one entry, representing the label) or
   # just a plain string.
-  label<-ifelse(is.data.frame(label),
-                label %>% dplyr::pull(1) %>% as.character(),
-                label)
+  if ( is.data.frame(label))
+    label <- as.character(label[[1]])
 
   # Create investigator chunks.
   formatted_investigators<-investigators %>%
     arrange_investigators_by_role() %>%
     dplyr::rowwise() %>%
     dplyr::summarize(
-      list(
-        flextable::as_chunk(format_investigator_name(.data$Investigator, ...), ),
-        flextable::as_chunk(ifelse(is.na(.data$Role), "", paste0(" (",.data$Role,")"))),
-        flextable::as_sup(ifelse(is_esi_investigator(`Partnership Role`),"1","")),
+      list(dplyr::bind_rows(
+        flextable::as_chunk(format_investigator_name(.data$investigator_name, ...), ),
+        flextable::as_chunk(ifelse(is.na(.data$investigator_role), "", paste0(" (",.data$investigator_role,")"))),
+        # Add in a superscript indicating various conditions (currently ESI, former ESI)
+        # NB: This may eventually need to handle cases of multiple subscripts per person.
+        flextable::as_sup(
+          flextable::as_b(
+          dplyr::case_when(
+            `isPartnershipRole_Former ESI` ~ "*",
+            isPartnershipRole_ESI ~ "\u2020",
+            .default = ""
+          )
+          )
+        ),
         flextable::as_chunk(sep)
-      )
+      ))
     ) %>%
     # Extract all of the tibble rows to a single tibble.
     stats::setNames(nm=NULL) %>%
@@ -144,37 +153,32 @@ format_investigator_group_as_text<-function(investigators, label="",
                                             summary_field="Investigator Summary", ...) {
   # The label is either a tibble (with one entry, representing the label) or
   # just a plain string.
-  label<-ifelse(is.data.frame(label),
-                label %>% dplyr::pull(1) %>% as.character(),
-                label)
+  if ( is.data.frame(label))
+    label <- as.character(label[[1]])
 
-  # Create investigator chunks.
-  formatted_investigators<-investigators %>%
-    arrange_investigators_by_role() %>%
-    dplyr::rowwise() %>%
-    dplyr::summarize(
-      list(
-        format_investigator_name(.data$Investigator, ...),
-        ifelse(is.na(.data$Role), "", paste0(" (",.data$Role,")")),
-        ifelse(is_esi_investigator(`Partnership Role`)," [ESI]",""),
-        sep
-      )
-    ) %>%
-    # This code mirrors the flextable, so the result of the above is a list of bits. Combine them.
-    unlist() %>%
-    # The trailing sep is not needed
-    head(-1) %>%
-    # Combine all elements into a single string.
-    stringr::str_c(collapse="")
 
+  # Create formatted investigator name
+  investigators <- investigators |>
+    arrange_investigators_by_role() |>
+    dplyr::mutate(
+      formatted_investigator_name = sprintf("%s%s%s", format_investigator_name(investigator_name,...),
+                                                        str_enclose(investigator_role),
+                                                        dplyr::case_when(
+                                                            `isPartnershipRole_Former ESI` ~ " [Former ESI]",
+                                                            isPartnershipRole_ESI ~ " [ESI]",
+                                                            .default = ""
+                                            )
+
+    ))
 
   # Final output is label, investigators. Only do label
   # if not empty or NA.
+  retstr <- stringi::stri_flatten(investigators$formatted_investigator_name, collapse=sep)
+
   if ( !is.na(label) && !(label==""))
-    formatted_investigators<-stringr::str_c(label, label_sep, formatted_investigators)
+    retstr <- stringi::stri_flatten(c(label, retstr), collapse = label_sep)
 
-
-  formatted_investigators
+  retstr
 
 
 }
@@ -286,8 +290,8 @@ format_investigators_by_institution<-function(investigators_list, group,
     investigators %>%
       # Arrange by the role, then transform institution into levels ordered by role.
       arrange_investigators_by_role() %>%
-      dplyr::mutate(Institution=factor(Institution, levels=unique(Institution))) %>%
-      dplyr::group_by(Institution) %>%
+      dplyr::mutate(investigator_institution=factor(investigator_institution, levels=unique(investigator_institution))) %>%
+      dplyr::group_by(investigator_institution) %>%
       dplyr::group_map(format_investigator_group, ...) %>%
       # Given a tibble of formatted investigators, collect into a single formatted paragraph.
       combine_investigator_groups()
@@ -328,128 +332,14 @@ format_investigators<-function(investigators_list, format_investigator_group, co
 
 
 
-#' Format investigator name
-#'
-#' For reporting, the investigator full name is often not needed because it takes up too much space.
-#' To uniquely identify a person, we use the convention of `GivenNameInitials. LastName, PhD`
-#' for instance.
-#'
-#' @details
-#' The data for pgreportr uses full names for investigators. Shortening these names to first initials
-#' is tricky since people may have multiple given names (i.e., middle names). This code takes all names
-#' except the last name (tokenized by whitespace) and abbreviates them, followed by a period. The last
-#' name is then added and returned.
-#'
-#' The degree (in the form of ,degree) is another variation. This code handles it's presence
-#' or absence. You can use the use_degree flag to print it out (or not).
-#'
-#' So, for instance
-#' in the case of
-#' ```
-#'      John James Smith
-#' ```
-#' his formatted name would be
-#' ```
-#'      JJ. Smith
-#' ```
-#'
-#' Note that this function supports either a single name or a vector of names, and will transform
-#' accordingly.
-#'
-#' Of note, while this code is reasonably competent it is by no means bullet-proof. You would need
-#' to check the results to verify it's worked as desired.
-#'
-#' TODO: There is bug if someone's name is John (Joe) Smith. The parens screw up a regex or
-#' something.
-#'
-#' @param n String representing the investigator name
-#' @param use_degree Should the degree be printed in the name?
-#' @param use_first_name_only Should only the first given name be used?
-#' @param use_initials Should only initials of the given name(s) be used?
-#' @param use_period_after_initials Should a period follow given name initials?
-#' @param use_last_name_first Should it be last name, first?
-#'
-#' @return A shortened name. If a vector is provided, a vector of shortened names is returned.
-#'
-#' @export
-#'
-#'
-format_name<-function(n, use_degree=TRUE, use_first_name_only=FALSE,
-                                   use_initials=TRUE, use_period_after_initials=TRUE,
-                                   use_last_name_first=FALSE, ...) {
-  # Name should be of the form
-  # First other last, Degree
-  name_and_degree<-stringr::str_split_fixed(n, ",( )*", n=2)
 
-
-  # Get the space-separated fields
-  nsplit<-stringr::str_split(name_and_degree[,1], " ")
-
-  # Last name is the last one of the list
-  last_name<-purrr::map_chr(nsplit, function(y){y[length(y)]})
-
-  # Given names are all except the last.
-  given_names<-purrr::map(nsplit, function(y){
-    if ( length(y) > 1)
-      y[1:length(y)-1]
-    else
-      NA
-  })
-
-
-  # Given name initials are the first character of all non-last name elements.
-  # Note we replace empty with NA (degenerate case of no first name).
-  if ( use_initials ) {
-    given_names<-purrr::map(given_names, function(y){
-      dplyr::na_if(stringr::str_sub(y[1:length(y)], start=1,end=1), "")
-    })
-  }
-
-  # Reduce to first name/initial if needed
-  given_names <- if ( use_first_name_only ) {
-    purrr::map(given_names,1)
-  } else {
-    purrr::map_chr(given_names, function(s){
-      stringr::str_c(s, collapse=ifelse(use_initials,""," "))
-    })
-  }
-
-  # Add in the trailing period after initials, if needed
-  if ( use_initials && use_period_after_initials )
-    given_names<-purrr::map_chr(given_names, function(s) stringr::str_c(s, ".",sep=""))
-
-  # Sometimes we have last, first ...
-  if ( use_last_name_first ) {
-    tmp<-given_names
-    given_names<-last_name
-    last_name<-tmp
-    rm(tmp)
-  }
-
-  # Now collapse given and last name, with punctuation/spacing
-  # given_name possibly ., then space unless it's NA and then nothing
-  name<-purrr::map2_chr(given_names, last_name, function(given,last) {
-
-    if (any(is.na(c(given,last))))
-      stats::na.omit(c(given,last))
-    else
-      stringr::str_c(given, last, sep=ifelse(use_last_name_first,", "," "))
-
-  })
-
-
-  if ( use_degree )
-    paste_noNA(name, name_and_degree[,2], sep=", ")
-  else
-    name
-}
 
 #' @describeIn format_name Format investigator
 format_investigator_name <- function(...) {
-  format_name(...)
+  pgimportr::format_name(...)
 }
 
 #' @describeIn format_name Format author
 format_author_name <- function(...) {
-  format_name(...)
+  pgimportr::format_name(...)
 }
