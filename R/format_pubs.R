@@ -120,8 +120,8 @@ format_author_as_chunks <- function(...) {
    ~txt, ~bold, ~underlined, ~vertical.align,
    author, TRUE, x$partnership_role=="REC Trainee"|NA, NA_character_,
    dplyr::case_when(
-     `isPartnershipRole_Former ESI` ~ "[Former ESI]",
-     isPartnershipRole_ESI ~ "[ESI]",
+     x[["isPartnershipRole_Former ESI"]] ~ "[Former ESI]",
+     x[["isPartnershipRole_ESI"]] ~ "[ESI]",
      .default = NA
    ),
    TRUE, NA, NA_character_
