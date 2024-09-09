@@ -171,7 +171,7 @@ style_grants_as_flextable_gamma<-function(d, ...) {
                   `Grant Status` = grant_status,
                   `U54 Core Support` = core_support,
                   `ESI Related` = dplyr::case_when(
-                    is_current_esi_related ~ "ESI",
+                    is_current_esi_related ~ "Current ESI",
                     is_former_esi_related ~ "Former ESI",
                     .default = ""
                   )
@@ -600,7 +600,7 @@ style_pubs_as_flextable_delta<-function(d, ...) {
     dplyr::mutate(
       `Citation Number`=dplyr::row_number(),
       `ESI Related` = dplyr::case_when(
-        is_current_esi_related ~ "ESI",
+        is_current_esi_related ~ "Current ESI",
         is_former_esi_related ~ "Former ESI",
         .default = ""
       ),
@@ -647,7 +647,7 @@ style_pubs_as_flextable_delta<-function(d, ...) {
     flextable::align(j="Formatted Reference", align = "justify") |>
 
     # Add footnotes for annotation.
-    flextable::add_footer_lines(values = c("L1","L2","L3","L4")) |>
+    flextable::add_footer_lines(values = c("L1","L2","L3")) |>
     flextable::compose(
       i=1,j=1, part="footer",
       value = flextable::as_paragraph(
@@ -661,14 +661,9 @@ style_pubs_as_flextable_delta<-function(d, ...) {
     ) |>
     flextable::compose(
       i=3, j=1, part="footer",
-      value = flextable::as_paragraph(
-        flextable::as_b("[ESI] Current Early Stage Investigator"))
-    ) |>
-
-    flextable::compose(
-      i=4, j=1, part="footer",
-      value = flextable::as_paragraph(
-        flextable::as_b("[Former ESI] Former Early Stage Investigator"))
+        value = flextable::as_paragraph(
+          flextable::as_b("Role: \u2020 (Current ESI), * (Former ESI)")
+        )
     ) |>
     # Last thing should be apply the overall styling
     apply_u54reportr_flextable_style()
