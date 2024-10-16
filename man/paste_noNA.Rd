@@ -22,5 +22,16 @@ Paste two vectors together using sep, suppressing NA (rather than contaminating)
 \details{
 Paste and str_c both appear to have a problem combining two strings when one is NA.
 Or alternately, when one string is NA the result should be only the first name with
-no sep or second component. This function does that correctly in the case of NA.
+no sep or second component. This function does that in the case of NA.
+}
+\examples{
+\dontrun{
+paste_noNA("A",NA)
+[1] "A"
+}
+\dontrun{
+paste_noNA("A","B")
+[1] "A, B"
+}
+
 }

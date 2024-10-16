@@ -3,11 +3,14 @@
 \name{is_moffitt_health_disparities}
 \alias{is_moffitt_health_disparities}
 \alias{is_pub_moffitt_health_disparities}
+\alias{is_grant_moffitt_health_disparities}
 \title{Title}
 \usage{
 is_moffitt_health_disparities(.x)
 
 is_pub_moffitt_health_disparities(.x)
+
+is_grant_moffitt_health_disparities(.x)
 }
 \arguments{
 \item{.x}{}
@@ -18,5 +21,7 @@ Title
 \section{Functions}{
 \itemize{
 \item \code{is_pub_moffitt_health_disparities()}: Is publication Moffitt Health-Disparities related
+
+\item \code{is_grant_moffitt_health_disparities()}: Is grant Moffitt Health-Disparities related
 
 }}

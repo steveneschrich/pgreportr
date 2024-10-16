@@ -1,7 +1,20 @@
-# count.R
-# Count the number of different things.
-#
-
+#' Count number of research products based on different criteria
+#'
+#' @description Counting totals can be a bit difficult in complex
+#'  data because the logic of what should be counted may not always
+#'  be obvious. The `count_` functions in this package are designed
+#'  to encode this logic and memorialize it for future reports.
+#'  * [filter_between()]
+#'  * [filter_in_year()]
+#'  * [filter_supported()]
+#'  * [filter_core_supported()]
+#'  * [filter_by_tag()]
+#'
+#' @note Ideally the `count` routines will only count existing records and
+#'  not try to do additional filtering, but this may be necessary (or desirable). If
+#'  filtering, then it should use the [filter()] section of this package.
+#' @name count
+NULL
 
 #' Count grant submissions by year
 #'
@@ -96,21 +109,37 @@ add_list_total<-function(l) {
 #' @export
 #'
 #' @examples
-count_esi_mentions_in_grant<-function(g) {
+count_current_esi_mentions_in_grant<-function(g) {
   purrr::map_int(g$investigators, \(.x) {
-    length(which(.x[["isPartnershipRole_ESI"]]))
+    length(which(.x[["isPartnershipRole_Current ESI"]]))
   })
 
 }
 
-count_esi_mentions_in_pubs <- function(.x) {
+count_current_esi_mentions_in_pubs <- function(.x) {
   warn("This may not work correctly")
   purrr::map_int(.x$investigators, \(.y) {
-    length(which(.y[["isPartnershipRole_ESI"]]))
+    length(which(.y[["isPartnershipRole_Current ESI"]]))
   })
 
 }
 
+count_current_esi_mentions <- function(.x, var) {
+  purrr::map_int(.x, \(.y) {
+    how_many(.y[[var]])
+  })
+}
+count_presentations_number_current_esi_mentions <- function(.x) {
+  count_current_esi_mentions(
+    .x[["presenters"]],
+    var = "isPartnershipRole_Current ESI"
+  )
+}
+
+ # purrr::map_int(.x$presenters, \(.y) {
+#    how_many(.y[["isPartnershipRole_Current ESI"]])
+#  })
+#}
 #' Title
 #'
 #' @param .x
@@ -120,8 +149,8 @@ count_esi_mentions_in_pubs <- function(.x) {
 #' @export
 #'
 #' @examples
-count_esi_mentions <- function(.x, var) {
-  sum(count_esi_creators(.x[[var]]))
+count_current_esi_mentions <- function(.x, var) {
+  sum(count_current_esi_creators(.x[[var]]))
 }
 
 
@@ -143,7 +172,7 @@ count_esi_mentions <- function(.x, var) {
 #' @export
 #'
 #' @examples
-count_esi_creators <- function(.x) {
-  purrr::map_int(.x, ~dplyr::filter(.x, is_creator_esi(partnership_role)) %>% nrow())
+count_current_esi_creators <- function(.x) {
+  purrr::map_int(.x, ~dplyr::filter(.x, is_creator_current_esi(partnership_role)) %>% nrow())
 }
 

@@ -24,6 +24,12 @@ is_pub_supported_by <- function(.x, ...) {
   is_supported_by(.x, ...)
 }
 
+#' @describeIn is_supported_by Is presentation supported by a resource?
+#' @export
+is_presentation_supported_by <- function(.x, ...) {
+  is_supported_by(.x, ...)
+
+}
 
 #' Title
 #'
@@ -61,7 +67,11 @@ is_grant_core_support <- function(.x) {
 is_pub_core_support <- function(.x) {
   is_core_support(.x)
 }
-
+#' @describeIn is_core_support Is presentation supported by core
+#' @export
+is_presentation_core_support <- function(.x) {
+  is_core_support(.x)
+}
 
 #' Title
 #'
@@ -86,7 +96,11 @@ is_pub_other_support <- function(.x) {
   is_other_supported(.x)
 }
 
-
+#' @describeIn is_other_support Is presentation supported by other support
+#' @export
+is_presentation_other_support <- function(.x) {
+  is_other_supported(.x)
+}
 
 #' Title
 #'
@@ -247,21 +261,42 @@ is_grant_joint<-function(tb=NULL) {
 #'
 #' @example
 #
-is_esi_related <- function(.x=NULL) {
-  dispatch_on_field(.x, name="is_esi_related")
+is_current_esi_related <- function(.x=NULL) {
+  dispatch_on_field(.x, name="is_current_esi_related")
 }
 
-#' @describeIn is_esi_related Is grant related to an ESI?
-#' @export
-is_grant_esi_related<-function(...) {
-  is_esi_related(...)
+is_former_esi_related <- function(.x = NULL) {
+  dispatch_on_field(.x, name="is_former_esi_related")
 }
 
-#' @describeIn is_esi_related Is publication related to an ESI?
+
 #' @export
-is_pub_esi_related <- function(...) {
-  is_esi_related(...)
+is_grant_current_esi_related<-function(...) {
+  is_current_esi_related(...)
 }
+is_grant_former_esi_related <- function(...) {
+  is_former_esi_related(...)
+}
+
+#' @export
+is_publication_current_esi_related <- function(...) {
+  is_current_esi_related(...)
+}
+is_pub_current_esi_related <- is_publication_current_esi_related
+is_publication_former_esi_related <- function(...) {
+  is_former_esi_related(...)
+}
+is_pub_former_esi_related <- is_publication_former_esi_related
+
+
+#' @export
+is_presentation_current_esi_related <- function(...) {
+  is_current_esi_related(...)
+}
+is_presentation_former_esi_related <- function(...) {
+  is_former_esi_related(...)
+}
+
 
 #' Operator overloading function
 #'
@@ -318,12 +353,14 @@ is_role <- function(role, target) {
   if (length(role) == 0)
     FALSE
   else
-    !is.na(role) & role == target
+    !is.na(role) & grepl(target, role)
 }
 
 #' @describeIn is_role Is investigator ESI?
 #' @export
-is_esi_investigator <- function(role) is_role(role, "ESI")
+is_current_esi_investigator <- function(role) is_role(role, "Current ESI")
+
+is_former_esi_investigator <- function(role) is_role(role, "Former ESI")
 
 #' @describeIn is_role Is the role a New Investigator role?
 #' @export
@@ -371,13 +408,19 @@ list_tags <- function(.x) {
 #' @export
 #'
 #' @examples
-is_creator_esi <- function(.x) {
-  .x == "ESI"
+is_creator_current_esi <- function(.x) {
+  .x == "Current ESI"
 }
-#' @describeIn is_creator_esi Is the author an ESI?
+is_creator_former_esi <- function(.x) {
+  .x == "Former ESI"
+}
+#'
 #' @export
-is_author_esi <- function(.x) is_creator_esi(.x)
+is_author_current_esi <- function(.x) is_creator_current_esi(.x)
+is_author_former_esi <- function(.x) is_creator_former_esi(.x)
 
-#' @describeIn is_creator_esi Is the investigator an ESI?
+#'
 #' @export
-is_investigator_esi <- function(.x) is_creator_esi(.x)
+is_investigator_current_esi <- function(.x) is_creator_current_esi(.x)
+
+is_investigator_former_esi <- function(.x) is_creator_former_esi(.x)

@@ -2,14 +2,14 @@
 % Please edit documentation in R/is.R
 \name{is_role}
 \alias{is_role}
-\alias{is_esi_investigator}
+\alias{is_current_esi_investigator}
 \alias{is_new_investigator}
 \alias{is_trainee}
 \title{Does investigator have a target role}
 \usage{
 is_role(role, target)
 
-is_esi_investigator(role)
+is_current_esi_investigator(role)
 
 is_new_investigator(role)
 
@@ -26,7 +26,7 @@ Does investigator have a target role
 }
 \section{Functions}{
 \itemize{
-\item \code{is_esi_investigator()}: Is investigator ESI?
+\item \code{is_current_esi_investigator()}: Is investigator ESI?
 
 \item \code{is_new_investigator()}: Is the role a New Investigator role?
 

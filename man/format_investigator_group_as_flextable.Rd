@@ -39,6 +39,6 @@ to these investigators, potentially formatted itself.
 The \code{label} field is an overloaded field. It is either a simple text string
 representing the name of the group, or a tibble. If it is a tibble, it is
 expected to contain a single value representing the label to use. The parameter
-is constructed this way to enable the \code{dplyr::group_map()} function to work,
+is constructed this way to enable the \code{\link[dplyr:group_map]{dplyr::group_map()}} function to work,
 since it passes a tibble with the grouped variables.
 }

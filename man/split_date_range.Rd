@@ -15,3 +15,10 @@ Two character vectors representing the first and second date, respectively.
 \description{
 Split dates that are in the form of start_date - end_date.
 }
+\examples{
+\dontrun{
+split_date_range("2024_01_01 - 2024_01_02")
+     [,1]          [,2]
+[1,] "2024_01_01 " " 2024_01_02"
+}
+}

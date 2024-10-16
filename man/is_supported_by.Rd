@@ -4,6 +4,7 @@
 \alias{is_supported_by}
 \alias{is_grant_supported_by}
 \alias{is_pub_supported_by}
+\alias{is_presentation_supported_by}
 \title{Title}
 \usage{
 is_supported_by(.x = NULL, support)
@@ -11,6 +12,8 @@ is_supported_by(.x = NULL, support)
 is_grant_supported_by(.x, ...)
 
 is_pub_supported_by(.x, ...)
+
+is_presentation_supported_by(.x, ...)
 }
 \arguments{
 \item{support}{}
@@ -23,5 +26,7 @@ Title
 \item \code{is_grant_supported_by()}: Is grant supported by a resource?
 
 \item \code{is_pub_supported_by()}: Is publication supported by a resource?
+
+\item \code{is_presentation_supported_by()}: Is presentation supported by a resource?
 
 }}

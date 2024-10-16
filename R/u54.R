@@ -110,7 +110,7 @@ is_pub_moffitt_health_disparities <- function(.x) {
 }
 
 
-#' @describeIn #' @describeIn is_moffitt_health_disparities Is grant Moffitt Health-Disparities related
+#' @describeIn is_moffitt_health_disparities Is grant Moffitt Health-Disparities related
 #' @export
 is_grant_moffitt_health_disparities <- function(.x) {
   is_moffitt_health_disparities(.x)

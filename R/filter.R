@@ -1,14 +1,31 @@
-#' Filtering grants and publications
+#' Filtering grants, publications and presentations
 #'
+#' @description Filtering functions for different objects. Generics include:
+#'  * [filter_between()]
+#'  * [filter_in_year()]
+#'  * [filter_supported()]
+#'  * [filter_core_supported()]
+#'  * [filter_by_tag()]
 #'
-#' @details This contains code for filtering the grant table based on
-#' various criteria. It is easier
-#' to implement these as functions, rather than remember the specific variables to filter on.
-#' The logic can be implemented consistently this way.
+#' @details The `pgreportr` package consists of three object types:
+#' grants, publications and presentations. These object types are tables with
+#' specific columns that have been created/formatted by `pgimportr`. When it
+#' comes to reporting on these objects, we typically want to filter on the
+#' status, the relevant dates, etc.
+#'
+#' The functions that being with `filter_` in this library are designed as
+#' syntactic sugar, but often valuable sugar. Rather than having to remember
+#' which specific fields to filter on, or the specific logic built into the
+#' filtering process, these functions provide it. Importantly, over time
+#' there will be an evolutionary process of incorporating logic that reflects the
+#' needs of program grants in a way that is not immediately obvious from the
+#' tables alone. This, we believe, is justification for the large number of
+#' function options available for use.
+#'
 #'
 #' @name filter
 NULL
-#> NULL
+
 
 
 #' Filter records between dates
@@ -18,22 +35,26 @@ NULL
 #'
 #' @details
 #'
-#' This function filters the grants table to only grants that are submitted between the
-#' specified start and end date. The dates must be input as YYYY-MM-DD format.
+#' This function filters a reporting table (grants, publications, presentations)
+#' to only those between the specified start and end date. The dates must be
+#' input as YYYY-MM-DD format.
 #'
-#' Note that
-#' if you do not specify an end date then today's date is used.
+#' If you are not sure what fields to use when filtering dates, consider using
+#' the `filter_grants_`, `filter_publications_`, `filter_presentations_` functions
+#' which provide that information directly.
 #'
-#' Note that the dates are inclusive (meaning they include the date specified).
+#' @note If you do not specify an end date then today's date is used.
+#' @note The dates are inclusive (meaning they include the date specified).
 #'
-#' @param .x The table to filter
+#' @param .x The table to filter (can be any data frame)
+#' @param var The variable to filter dates on (changes between types).
 #' @param start Start date (YYYY-MM-DD)
 #' @param end End date (YYYY-MM-DD) default: current date
 #'
 #' @return A table filtered on start/end dates for `var`.
 #'
+#' @seealso [filter]
 #' @importFrom lubridate %within%
-#' @importFrom dplyr %>%
 #'
 #' @export
 #' @examples
@@ -43,27 +64,6 @@ filter_between <- function(.x, var, start, end = format(Sys.time(), '%Y%m%d')) {
   dplyr::filter(.x, {{ var }} %within% lubridate::interval(start,end))
 }
 
-#' @describeIn filter_between Filter grants submitted between dates
-#' @export
-filter_grants_submitted_between<-function(.x, ...) {
-  .x |>
-    filter_grants_submitted() |>
-    filter_between(var = submission_date, ...)
-}
-
-#' @describeIn filter_between Filter grants funded between dates
-#' @export
-filter_grants_funded_between <- function(.x, ...) {
-  .x |>
-    filter_grants_funded() |>
-    filter_between(var = funding_start_date, ...)
-}
-
-#' @describeIn filter_between Filter publications published between dates
-#' @export
-filter_pubs_between <- function(.x, ...) {
-  filter_between(.x, var = publication_date, ...)
-}
 
 
 
@@ -94,28 +94,7 @@ filter_in_year <- function(.x, var, yr = pg_project_years() ) {
 }
 
 
-#' @describeIn filter_in_year Filter grants submitted in year
-#' @export
-filter_grants_submitted_in_year <- function(.x, ...) {
-  .x |>
-    filter_grants_submitted() |>
-    filter_in_year(var = pg_year_submitted, ...)
-}
 
-#' @describeIn filter_in_year Filter grants with funding starting in PG year yr.
-#' @export
-filter_grants_funded_in_year<-function(.x, ...) {
-  .x |>
-    filter_grants_funded() |>
-    filter_in_year(var = pg_year_funded, ...)
-
-}
-
-#' @describeIn filter_in_year Filter publications in Partnership Grant year yr
-#' @export
-filter_pubs_in_year <- function(.x, ...) {
-  filter_in_year(var = pg_year_published, ...)
-}
 
 
 
@@ -154,21 +133,21 @@ filter_grants_submitted<-function(d) {
 #'
 #' @importFrom rlang .data
 #' @examples
-filter_grants_esi_related<-function(d) {
-  dplyr::filter(d, !!is_grant_esi_related())
+filter_grants_current_esi_related<-function(d) {
+  dplyr::filter(d, !!is_grant_current_esi_related())
 }
 
-#' Title
-#'
-#' @param .x
-#'
-#' @return
+#' @describeIn filter_grants_current_esi_related Filter publications in Partnership Grant year yr
 #' @export
-#'
-#' @examples
-filter_pubs_esi_related <- function(.x) {
-  dplyr::filter(.x, !!is_pub_esi_related())
+filter_grants_former_esi_related<-function(d) {
+  dplyr::filter(d, !!is_grant_former_esi_related())
 }
+
+
+
+
+
+
 
 #' Filter grant list to grants not funded.
 #'

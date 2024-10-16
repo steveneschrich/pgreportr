@@ -2,13 +2,22 @@
 % Please edit documentation in R/utils.R
 \name{format_date_as_mdy}
 \alias{format_date_as_mdy}
-\title{Title}
+\title{Format date value as mdy}
 \usage{
 format_date_as_mdy(d)
 }
 \arguments{
-\item{d}{}
+\item{d}{A date to format}
+}
+\value{
+A character vector representing the mdy format of \code{d}.
 }
 \description{
-Title
+Short-hand function for formatting per mdy standard (m/d/y).
+}
+\examples{
+\dontrun{
+format_date_as_mdy(as.Date("2024-01-01"))
+[1] "01/01/2024"
+}
 }

@@ -2,13 +2,22 @@
 % Please edit documentation in R/utils.R
 \name{format_date_as_month_year}
 \alias{format_date_as_month_year}
-\title{Title}
+\title{Format date value as month-year}
 \usage{
 format_date_as_month_year(d)
 }
 \arguments{
-\item{d}{}
+\item{d}{A date to format}
+}
+\value{
+A character vector representing the month year format of \code{d}.
 }
 \description{
-Title
+Short-hand function for formatting per month year standard.
+}
+\examples{
+\dontrun{
+format_date_as_month_year(as.Date("2024-01-01"))
+[1] "Jan 2024"
+}
 }

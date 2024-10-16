@@ -4,6 +4,7 @@
 \alias{is_core_support}
 \alias{is_grant_core_support}
 \alias{is_pub_core_support}
+\alias{is_presentation_core_support}
 \title{Title}
 \usage{
 is_core_support(.x)
@@ -11,6 +12,8 @@ is_core_support(.x)
 is_grant_core_support(.x)
 
 is_pub_core_support(.x)
+
+is_presentation_core_support(.x)
 }
 \arguments{
 \item{.x}{}
@@ -23,5 +26,7 @@ Title
 \item \code{is_grant_core_support()}: Is grant supported by core
 
 \item \code{is_pub_core_support()}: Is pub supported by core
+
+\item \code{is_presentation_core_support()}: Is presentation supported by core
 
 }}

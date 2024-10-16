@@ -63,7 +63,7 @@ collapse_invstigators_alt <- function(.x) {
 #' The `label` field is an overloaded field. It is either a simple text string
 #' representing the name of the group, or a tibble. If it is a tibble, it is
 #' expected to contain a single value representing the label to use. The parameter
-#' is constructed this way to enable the `dplyr::group_map()` function to work,
+#' is constructed this way to enable the [dplyr::group_map()] function to work,
 #' since it passes a tibble with the grouped variables.
 #'
 #' @param i An investigator tibble
@@ -97,7 +97,7 @@ format_investigator_group_as_flextable<-function(investigators, label="",
           flextable::as_b(
           dplyr::case_when(
             `isPartnershipRole_Former ESI` ~ "*",
-            isPartnershipRole_ESI ~ "\u2020",
+            `isPartnershipRole_Current ESI` ~ "\u2020",
             .default = ""
           )
           )
@@ -165,7 +165,7 @@ format_investigator_group_as_text<-function(investigators, label="",
                                                         str_enclose(investigator_role),
                                                         dplyr::case_when(
                                                             `isPartnershipRole_Former ESI` ~ " [Former ESI]",
-                                                            isPartnershipRole_ESI ~ " [ESI]",
+                                                            `isPartnershipRole_Current ESI` ~ " [Current ESI]",
                                                             .default = ""
                                             )
 
@@ -333,13 +333,7 @@ format_investigators<-function(investigators_list, format_investigator_group, co
 
 
 
-
-#' @describeIn format_name Format investigator
 format_investigator_name <- function(...) {
   pgimportr::format_name(...)
 }
 
-#' @describeIn format_name Format author
-format_author_name <- function(...) {
-  pgimportr::format_name(...)
-}

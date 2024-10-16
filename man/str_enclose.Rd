@@ -2,13 +2,29 @@
 % Please edit documentation in R/utils.R
 \name{str_enclose}
 \alias{str_enclose}
-\title{Title}
+\title{Enclose a string in brackets}
 \usage{
 str_enclose(s, open = "(", close = ")", add_space = TRUE)
 }
 \arguments{
-\item{add_space}{}
+\item{s}{A string to enclose}
+
+\item{open}{The open character (default is paren)}
+
+\item{close}{The close character (default is paren)}
+
+\item{add_space}{(TRUE) Should a leading space be added?}
+}
+\value{
+\code{s} enclosed by \code{open} and \code{close}.
 }
 \description{
-Title
+\code{str_enclose()} encloses a string in parentheses (default) or
+other open/close characters. It supports adding a leading space and does not
+enclose NA.
+}
+\examples{
+\dontrun{
+  str_enclose("testing",open="[",close="]")
+}
 }

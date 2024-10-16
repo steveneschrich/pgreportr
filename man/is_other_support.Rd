@@ -4,6 +4,7 @@
 \alias{is_other_support}
 \alias{is_grant_other_support}
 \alias{is_pub_other_support}
+\alias{is_presentation_other_support}
 \title{Title}
 \usage{
 is_other_support(.x)
@@ -11,6 +12,8 @@ is_other_support(.x)
 is_grant_other_support(.x)
 
 is_pub_other_support(.x)
+
+is_presentation_other_support(.x)
 }
 \arguments{
 \item{.x}{}
@@ -23,5 +26,7 @@ Title
 \item \code{is_grant_other_support()}: Is grant supported by other support
 
 \item \code{is_pub_other_support()}: Is pub supported by other support
+
+\item \code{is_presentation_other_support()}: Is presentation supported by other support
 
 }}
