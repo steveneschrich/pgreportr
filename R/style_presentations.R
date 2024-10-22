@@ -23,7 +23,7 @@ style_presentations_as_flextable_delta<-function(d, ...) {
   tbl <- d |>
     # Add in a presentation number (specific to this data).
     dplyr::mutate(
-      `Abstract Number`=abstract_id,
+      `Abstract Number`=dplyr::row_number(),#abstract_id,
       `ESI Related` = dplyr::case_when(
         is_current_esi_related ~ "Current ESI",
         is_former_esi_related ~ "Former ESI",
