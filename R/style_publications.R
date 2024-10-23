@@ -47,10 +47,13 @@ style_publications_as_flextable_delta<-function(d, ...) {
     # Add in a publication number (specific to this data).
     dplyr::mutate(
       `Citation Number`=dplyr::row_number(),
-      `ESI Related` = dplyr::case_when(
-        is_current_esi_related ~ "Current ESI",
-        is_former_esi_related ~ "Former ESI",
-        .default = ""
+      # combined not via stringr though. That's more tidyr
+      `ESI Related` = vec_unite(
+        c(ifelse(is_current_esi_related, "Current ESI","")),
+        c(ifelse(is_former_esi_related, "Former ESI", "")),
+        sep=", ",
+        na.rm = TRUE,
+        na.empty = TRUE
       ),
       `Publication Year` = publication_year,
       `U54 Support` = support

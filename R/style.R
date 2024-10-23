@@ -170,12 +170,16 @@ style_grants_as_flextable_gamma<-function(d, ...) {
                   Title = grant_title,
                   `Grant Status` = grant_status,
                   `U54 Core Support` = core_support,
-                  `ESI Related` = dplyr::case_when(
-                    is_current_esi_related ~ "Current ESI",
-                    is_former_esi_related ~ "Former ESI",
-                    .default = ""
+                  # combined not via stringr though. That's more tidyr
+                  `ESI Related` = vec_unite(
+                    c(ifelse(is_current_esi_related, "Current ESI","")),
+                    c(ifelse(is_former_esi_related, "Former ESI", "")),
+                    sep=", ",
+                    na.rm = TRUE,
+                    na.empty = TRUE
                   )
-                  ) |>
+
+    )|>
     dplyr::select(`Grant Type`, `Source`, `Submission Date`,  `investigators`, `Title`, `Grant Status`,`U54 Core Support`,`ESI Related`) |>
     dplyr::mutate(`Grant Status` =
                     dplyr::case_when(

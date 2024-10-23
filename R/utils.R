@@ -95,6 +95,66 @@ paste_noNA<-function(v1, v2, sep=", ") {
   x
 }
 
+#' Extended str_flatten function
+#'
+#' A version of [stringr::str_flatten()] with support for removing empty (zero-length)
+#' strings prior to flattening.
+#'
+#' @param s Input vector. Either a character vector or something coercible into one.
+#' @param collapse String to insert between each piece. Defaults to "".
+#' @param last Optional string to use in place of the final separator.
+#' @param na.rm Remove missing values?
+#' @param rm.empty Remove empty values? If TRUE, empty strings "" are removed. Sets na.rm=TRUE as well.
+#' @param unique Uniquify string vector before collapsing.
+#'
+#' @return A string, i.e. a character vector of length 1.
+#' @export
+#'
+#' @seealso [stringr::str_flatten()]
+#' @seealso [str_flatten_comma()]
+str_flatten <- function(s, collapse= "", last = NULL, na.rm=FALSE, rm.empty = TRUE, unique = TRUE) {
+  if ( rm.empty )
+    s <- dplyr::na_if(s, "")
+  if ( unique )
+    s <- unique(s)
+  stringr::str_flatten(s, collapse = collapse, last = last, na.rm=TRUE)
+}
+
+#' @describeIn str_flatten variation designed to mirror [stringr::str_flatten_comma()] but with
+#'  removing empty strings.
+str_flatten_comma <- function(s, last = NULL, na.rm = FALSE, rm.empty = TRUE, unique = TRUE) {
+  if ( rm.empty )
+    s <- dplyr::na_if(s, "")
+  if ( unique )
+    s <- unique(s)
+  stringr::str_flatten_comma(s, last = last, na.rm=TRUE)
+}
+
+
+#' Unite parallel vectors of strings into a combined single vector
+#'
+#' @param ... Vectors of strings to combine.
+#' @param sep Used `sep` for combining elements.
+#' @param na.rm Remove NA values before combining.
+#' @param na.empty Treat empty ("") values as NA.
+#'
+#' @return A vector of combined strings.
+#' @export
+#'
+vec_unite <- function(..., sep = ", ", na.rm = TRUE, na.empty = TRUE) {
+  args <- list(...)
+  args <- setNames(args, paste0("X",seq_along(args)))
+
+  if ( na.empty ) {
+    args <- purrr::map(args, \(.x) {dplyr::na_if(as.character(.x), "")})
+    na.rm = TRUE
+  }
+  x <- tibble::as_tibble(args)
+  y <- tidyr::unite(x, col = "newcol", dplyr::everything(), sep=sep,na.rm = na.rm)
+  y <- dplyr::pull(y, "newcol")
+
+  y
+}
 
 #' Return today's date as YYMMDD for printing.
 #'

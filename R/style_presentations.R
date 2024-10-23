@@ -24,11 +24,16 @@ style_presentations_as_flextable_delta<-function(d, ...) {
     # Add in a presentation number (specific to this data).
     dplyr::mutate(
       `Abstract Number`=dplyr::row_number(),#abstract_id,
-      `ESI Related` = dplyr::case_when(
-        is_current_esi_related ~ "Current ESI",
-        is_former_esi_related ~ "Former ESI",
-        .default = ""
+      # I think this has to be two text columns that are
+      # combined not via stringr though. That's more tidyr
+      `ESI Related` = vec_unite(
+        c(ifelse(is_current_esi_related, "Current ESI","")),
+        c(ifelse(is_former_esi_related, "Former ESI", "")),
+        sep=", ",
+        na.rm = TRUE,
+        na.empty = TRUE
       ),
+
       `Presentation Year` = presentation_year,
       `U54 Support` = support
     )
