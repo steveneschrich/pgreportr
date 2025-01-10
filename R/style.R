@@ -169,7 +169,7 @@ style_grants_as_flextable_gamma<-function(d, ...) {
                   Source = grant_source,
                   Title = grant_title,
                   `Grant Status` = grant_status,
-                  `U54 Core Support` = core_support,
+                  `U54 Support` = support,
                   # combined not via stringr though. That's more tidyr
                   `ESI Related` = vec_unite(
                     c(ifelse(is_current_esi_related, "Current ESI","")),
@@ -180,7 +180,7 @@ style_grants_as_flextable_gamma<-function(d, ...) {
                   )
 
     )|>
-    dplyr::select(`Grant Type`, `Source`, `Submission Date`,  `investigators`, `Title`, `Grant Status`,`U54 Core Support`,`ESI Related`) |>
+    dplyr::select(`Grant Type`, `Source`, `Submission Date`,  `investigators`, `Title`, `Grant Status`,`U54 Support`,`ESI Related`) |>
     dplyr::mutate(`Grant Status` =
                     dplyr::case_when(
                       `Grant Status` == "Funded" ~"F",
@@ -191,7 +191,7 @@ style_grants_as_flextable_gamma<-function(d, ...) {
 
     # Add to flextable, this is likely to change.
     flextable::flextable(col_keys=c("Grant Type","Source","Submission Date","Investigators","Title","Grant Status",
-                                    "U54 Core Support", "ESI Related",
+                                    "U54 Support", "ESI Related",
                                     "investigators"),
 
                          cwidth=c(0.2, 0.5, 0.5,1.75,2.5, 0.4, 0.4,0.3,1)) %>%
